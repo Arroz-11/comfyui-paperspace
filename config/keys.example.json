@@ -1,0 +1,10 @@
+{
+  "civitai": "",
+  "huggingface": "",
+  "r2": {
+    "account_id": "",
+    "access_key_id": "",
+    "secret_access_key": "",
+    "bucket": ""
+  }
+}
