@@ -16,8 +16,8 @@ the machine and everything installs itself — the free-tier GPUs (up to an A600
 bash /notebooks/scripts/start.sh & PIP_DISABLE_PIP_VERSION_CHECK=1 jupyter lab --allow-root --ip=0.0.0.0 --no-browser --ServerApp.trust_xheaders=True --ServerApp.disable_check_xsrf=False --ServerApp.allow_remote_access=True --ServerApp.allow_origin='*' --ServerApp.allow_credentials=True
 ```
 
-First boot installs ComfyUI (~15 min). Every boot after that takes ~2 min.
-ComfyUI ends up at `https://tensorboard-<your-notebook-fqdn>`.
+First boot installs everything in **~5 minutes** (measured); boots after that
+take ~2. ComfyUI ends up at `https://tensorboard-<your-notebook-fqdn>`.
 
 ## Day to day
 

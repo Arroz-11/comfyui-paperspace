@@ -58,7 +58,7 @@ mkdir -p "$HF_HOME"
 
 # ── 5. ComfyUI: install only if missing ───────────────────────
 if [ ! -d "$COMFY/.git" ]; then
-    step "5/6 installing ComfyUI (first time, ~15 min)"
+    step "5/6 installing ComfyUI (first time, ~4 min)"
 
     git clone https://github.com/comfyanonymous/ComfyUI.git "$COMFY"
 
