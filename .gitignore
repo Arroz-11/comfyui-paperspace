@@ -1,0 +1,10 @@
+# Se instala en la máquina, no se versiona
+ComfyUI/
+
+# Keys y logs — NUNCA al repo
+config/keys.json
+logs/
+*.log
+
+# Notas de trabajo locales (no van al repo público)
+MIS-PASOS.md
