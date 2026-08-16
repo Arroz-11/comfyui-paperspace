@@ -17,6 +17,7 @@ import pathlib
 import re
 import shutil
 import subprocess
+import time
 import urllib.parse
 from datetime import datetime
 
@@ -483,26 +484,35 @@ def hf_ui():
                     files, dest_ui, dl_btn, bar, status, out]))
 
 
-def _hf_fetch(repo, file, folder, token=None):
-    """Download one HF file flat into ComfyUI/models/<folder> via hardlink."""
-    from huggingface_hub import hf_hub_download
+def _hf_stream(repo, file, folder, token=None, progress=None):
+    """Stream one HF file flat into ComfyUI/models/<folder>.
+
+    Straight to the target (no HF cache copy): the file lands ONCE, where
+    ComfyUI reads it. progress(done, total, elapsed) is called per chunk.
+    """
+    import requests
     dest = MODELS / folder
     dest.mkdir(parents=True, exist_ok=True)
     target = dest / pathlib.Path(file).name
     if target.exists():
         return target, False
-    cached = hf_hub_download(repo, file, token=token)
-    real = os.path.realpath(cached)
+    url = f"https://huggingface.co/{repo}/resolve/main/{urllib.parse.quote(file)}"
+    r = requests.get(url, stream=True, timeout=30,
+                     headers={"Authorization": f"Bearer {token}"} if token else {})
+    r.raise_for_status()
+    total = int(r.headers.get("Content-Length") or 0)
+    tmp = target.with_name(target.name + ".part")
+    done, t0 = 0, time.time()
     try:
-        os.link(real, target)
-    except OSError:
-        shutil.copy2(real, target)
-        try:
-            os.remove(real)
-            if os.path.islink(cached):
-                os.remove(cached)
-        except OSError:
-            pass
+        with open(tmp, "wb") as f:
+            for chunk in r.iter_content(8 * 1024 * 1024):
+                f.write(chunk)
+                done += len(chunk)
+                if progress:
+                    progress(done, total, time.time() - t0)
+        tmp.rename(target)
+    finally:
+        tmp.unlink(missing_ok=True)   # no half-downloaded files left behind
     return target, True
 
 
@@ -572,22 +582,23 @@ def presets_ui():
                     if code == "gated":
                         return
             bar.layout.visibility = "visible"
-            # HF's own progress bars are noisy (split_files/... names, double
-            # bars) — silence them; our bar + label carry the progress.
-            from huggingface_hub.utils import disable_progress_bars, enable_progress_bars
-            disable_progress_bars()
-            try:
-                for i, f in enumerate(todo, 1):
-                    name = pathlib.Path(f["file"]).name
-                    bar.value = (i - 1) / len(todo) * 100
-                    lbl.value = f"⬇️ [{i}/{len(todo)}] {name} ({f['gb']:.2f} GB)…"
-                    try:
-                        _hf_fetch(f["repo"], f["file"], f["folder"], token)
-                        print(f"✅ {name} → {f['folder']}")
-                    except Exception as e:
-                        print(f"❌ {name}: {e}")
-            finally:
-                enable_progress_bars()
+            for i, f in enumerate(todo, 1):
+                name = pathlib.Path(f["file"]).name
+                bar.value = (i - 1) / len(todo) * 100
+
+                def _prog(done, total, dt, i=i, name=name):
+                    if total:
+                        bar.value = ((i - 1) + done / total) / len(todo) * 100
+                    speed = done / dt / 1e6 if dt > 0.5 else 0
+                    lbl.value = (f"⬇️ [{i}/{len(todo)}] {name} — "
+                                 f"{_fmt(done)} / {_fmt(total)}"
+                                 + (f"  ({speed:.0f} MB/s)" if speed else ""))
+
+                try:
+                    _hf_stream(f["repo"], f["file"], f["folder"], token, _prog)
+                    print(f"✅ {name} → {f['folder']}")
+                except Exception as e:
+                    print(f"❌ {name}: {e}")
             bar.value = 100
             bar.layout.visibility = "hidden"
             lbl.value = "✅ done"
@@ -602,14 +613,15 @@ def presets_ui():
 
 
 # ── Cleaner ─────────────────────────────────────────────────────
+STORAGE_GB = 50   # storage included in the Gradient plan (Growth) — what you
+                  # pay for is what's INSIDE /notebooks, so the bar measures
+                  # that (df lies here: /notebooks sits on a huge shared FS)
+
+
 def _disk_html():
-    """Usage bar for /notebooks + breakdown of the heavy folders.
+    """Usage bar for /notebooks (vs plan storage) + heavy-folder breakdown.
     Hardlinked files (models <-> HF cache) are counted once, under the
     first bucket that sees them — so 'HF cache' shows only its UNIQUE bytes."""
-    try:
-        usage = shutil.disk_usage(ROOT)
-    except OSError:
-        return "<i>disk info unavailable</i>"
     seen = set()
 
     def sz(path):
@@ -633,22 +645,25 @@ def _disk_html():
 
     # Order matters: earlier buckets claim shared (hardlinked) bytes.
     # 'ComfyUI (rest)' scans all of ComfyUI/ but venv+models are already seen.
+    # 'other' scans all of /notebooks — only not-yet-seen files remain.
     parts = [("models", sz(MODELS)),
              ("ComfyUI venv", sz(COMFY / "comfyenv")),
              ("ComfyUI (rest)", sz(COMFY)),
-             ("HF cache", sz(ROOT / "huggingface_cache"))]
-    parts.append(("other", max(0, usage.used - sum(s for _, s in parts))))
+             ("HF cache", sz(ROOT / "huggingface_cache")),
+             ("other", sz(ROOT))]
+    used = sum(s for _, s in parts)
+    limit = STORAGE_GB * 1000 ** 3
 
-    pct = usage.used / usage.total * 100 if usage.total else 0
+    pct = used / limit * 100
     color = "#4caf50" if pct < 80 else "#ff9800" if pct < 90 else "#f44336"
     rows = "".join(
         f"<tr><td style='padding-right:14px'>{name}</td>"
         f"<td style='text-align:right'>{_fmt(size)}</td>"
         f"<td style='text-align:right;padding-left:14px;opacity:.7'>"
-        f"{size / usage.total * 100:.0f}%</td></tr>"
+        f"{size / limit * 100:.0f}%</td></tr>"
         for name, size in parts if size)
     return (
-        f"<b>💾 /notebooks: {_fmt(usage.used)} / {_fmt(usage.total)} ({pct:.0f}%)</b>"
+        f"<b>💾 /notebooks: {_fmt(used)} / {STORAGE_GB} GB plan storage ({pct:.0f}%)</b>"
         f"<div style='width:700px;height:10px;background:#333;border-radius:5px;margin:4px 0 8px'>"
         f"<div style='width:{min(pct, 100):.1f}%;height:100%;background:{color};border-radius:5px'></div></div>"
         f"<table style='font-family:monospace'>{rows}</table>")
