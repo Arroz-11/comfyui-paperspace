@@ -744,9 +744,16 @@ def cleaner_ui():
         _gate(None)
 
     def _refresh_all(_=None):
-        disk.value = _disk_html()
         folder_dd.options = folder_options()
         _refresh_items()
+
+    def _show_disk(_=None):
+        # Full-tree scan (slow on first run) -> only on demand, never on open
+        disk_btn.disabled, disk_btn.description = True, "⏳ scanning…"
+        try:
+            disk.value = _disk_html()
+        finally:
+            disk_btn.disabled, disk_btn.description = False, "📊 Storage"
 
     def _gate(_):
         ok = folder_dd.value and _allowed(folder_dd.value) and confirm.value
@@ -793,9 +800,12 @@ def cleaner_ui():
         w.observe(_gate, names="value")
     run.on_click(_run)
 
-    disk = W.HTML(_disk_html())
-    display(W.VBox([W.HTML("<h3>🧹 Cleaner</h3>"), disk, W.HTML("<hr>"),
-                    folder_dd, mode,
+    disk = W.HTML()
+    disk_btn = W.Button(description="📊 Storage", button_style="info",
+                        layout=W.Layout(width="120px", height="32px"))
+    disk_btn.on_click(_show_disk)
+    display(W.VBox([W.HTML("<h3>🧹 Cleaner</h3>"), disk_btn, disk,
+                    W.HTML("<hr>"), folder_dd, mode,
                     W.HBox([sel_all, refresh]), items, confirm, run, logw]))
     _refresh_items()
 
