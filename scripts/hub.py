@@ -24,19 +24,9 @@ ROOT = pathlib.Path("/notebooks")
 MODELS = ROOT / "ComfyUI" / "models"
 KEYS_FILE = ROOT / "config" / "keys.json"
 
-FOLDERS = {
-    "Checkpoints": MODELS / "checkpoints",
-    "Diffusion Models": MODELS / "diffusion_models",
-    "Loras": MODELS / "loras",
-    "VAE": MODELS / "vae",
-    "CLIP": MODELS / "clip",
-    "CLIP Vision": MODELS / "clip_vision",
-    "Text Encoders": MODELS / "text_encoders",
-    "UNet": MODELS / "unet",
-    "Upscale Models": MODELS / "upscale_models",
-    "Model Patches": MODELS / "model_patches",
-    "Custom": None,  # free-text path
-}
+# Destination folders are read LIVE from ComfyUI/models: whatever exists there
+# (including folders created by custom nodes) shows up on its own — no list to
+# maintain. "Custom" stays as a free-text path escape hatch.
 
 
 # ── keys ────────────────────────────────────────────────────────
@@ -120,11 +110,20 @@ def _token_box(key_name, label, on_saved=None):
     return W.VBox([status, W.HBox([field, btn])]), lambda: _keys().get(key_name, "")
 
 
+def _model_folders():
+    """Live list of ComfyUI/models subfolders (self-updating)."""
+    if MODELS.is_dir():
+        return sorted(d.name for d in MODELS.iterdir() if d.is_dir())
+    return []
+
+
 def _dest_picker():
-    """Dropdown of model folders + free-text path when 'Custom' is chosen."""
+    """Dropdown of ComfyUI/models/* (read live) + free-text 'Custom' path."""
     import ipywidgets as W
-    dd = W.Dropdown(options=list(FOLDERS.keys()), value="Checkpoints",
-                    description="Save to:", style={"description_width": "80px"},
+    opts = _model_folders() + ["Custom"]
+    default = "checkpoints" if "checkpoints" in opts else opts[0]
+    dd = W.Dropdown(options=opts, value=default, description="Save to:",
+                    style={"description_width": "80px"},
                     layout=W.Layout(width="280px"))
     custom = W.Text(placeholder="/notebooks/custom/path",
                     layout=W.Layout(width="360px"), disabled=True)
@@ -134,7 +133,7 @@ def _dest_picker():
     def path():
         if dd.value == "Custom":
             return custom.value.strip()
-        p = FOLDERS[dd.value]
+        p = MODELS / dd.value
         p.mkdir(parents=True, exist_ok=True)
         return str(p)
 
