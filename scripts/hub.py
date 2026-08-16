@@ -3,24 +3,71 @@
 Usage from a cell:
     import sys; sys.path.append('/notebooks/scripts')
     from hub import *
+
+The widget UIs (civitai_ui, hf_ui, cleaner_ui, r2_ui) are ports of the
+original Util.ipynb, with the known flaws fixed:
+  - HF used cache + copy (double disk) -> hardlink with copy fallback
+  - HF "Custom" destination was dead code -> now a real option
+  - R2 force-overwrite monkeypatched a global -> plain `force` param
+  - tokens are read/saved in config/keys.json (each UI has a save box)
 """
 import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
+import urllib.parse
+from datetime import datetime
 
 ROOT = pathlib.Path("/notebooks")
 MODELS = ROOT / "ComfyUI" / "models"
+KEYS_FILE = ROOT / "config" / "keys.json"
 
+FOLDERS = {
+    "Checkpoints": MODELS / "checkpoints",
+    "Diffusion Models": MODELS / "diffusion_models",
+    "Loras": MODELS / "loras",
+    "VAE": MODELS / "vae",
+    "CLIP": MODELS / "clip",
+    "CLIP Vision": MODELS / "clip_vision",
+    "Text Encoders": MODELS / "text_encoders",
+    "UNet": MODELS / "unet",
+    "Upscale Models": MODELS / "upscale_models",
+    "Model Patches": MODELS / "model_patches",
+    "Custom": None,  # free-text path
+}
+
+
+# ── keys ────────────────────────────────────────────────────────
 def _keys():
-    f = ROOT / "config" / "keys.json"
-    if f.exists():
-        return json.loads(f.read_text())
-    print("⚠ no config/keys.json — copy config/keys.example.json and fill it in")
-    return {}
+    try:
+        return json.loads(KEYS_FILE.read_text())
+    except Exception:
+        return {}
 
-KEYS = _keys()
+
+def _save_key(name, value):
+    keys = _keys()
+    keys[name] = value
+    KEYS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    KEYS_FILE.write_text(json.dumps(keys, indent=2))
+
+
+def _fmt(n):
+    try:
+        n = float(n)
+    except (TypeError, ValueError):
+        return "?"
+    for unit in ("B", "KB", "MB", "GB"):
+        if n < 1024:
+            return f"{n:.2f} {unit}"
+        n /= 1024
+    return f"{n:.2f} TB"
+
+
+def _now():
+    return datetime.now().strftime("%H:%M:%S")
 
 
 # ── ComfyUI link ────────────────────────────────────────────────
@@ -36,114 +83,542 @@ def link():
     print(f"https://tensorboard-{fqdn}")
 
 
-# ── logs ────────────────────────────────────────────────────────
 def log(name="boot", lines=40):
-    """log('boot') or log('comfyui'). Live follow -> terminal: tail -f /notebooks/logs/<name>.log"""
+    """log('boot') or log('comfyui'). Live: tail -f /notebooks/logs/<name>.log"""
     p = ROOT / "logs" / f"{name}.log"
-    if not p.exists():
-        print(f"no {p}")
-        return
-    print("\n".join(p.read_text(errors="replace").splitlines()[-lines:]))
+    print("\n".join(p.read_text(errors="replace").splitlines()[-lines:])
+          if p.exists() else f"no {p}")
 
 
-# ── downloads ───────────────────────────────────────────────────
-def civitai(url, folder="checkpoints"):
-    """civitai('https://civitai.com/models/1102...', 'loras')
-    Folders: checkpoints · loras · vae · diffusion_models · text_encoders · upscale_models"""
+# ── shared widget bits ──────────────────────────────────────────
+def _token_box(key_name, label, on_saved=None):
+    """Password field + save button that stores into config/keys.json."""
+    import ipywidgets as W
+    current = _keys().get(key_name, "")
+    status = W.HTML(
+        f"<span style='color:green'>✅ {label} configured: "
+        f"{current[:4]}…{current[-4:]}</span>" if current else
+        f"<span style='color:orange'>⚠️ No {label} configured</span>")
+    field = W.Password(value=current, placeholder=f"{label} token",
+                       description="Token:", style={"description_width": "80px"},
+                       layout=W.Layout(width="440px"))
+    btn = W.Button(description="💾 Save", button_style="info",
+                   layout=W.Layout(width="90px", height="32px"))
+
+    def _save(_):
+        tok = field.value.strip()
+        if not tok:
+            status.value = "<span style='color:red'>❌ empty token</span>"
+            return
+        _save_key(key_name, tok)
+        status.value = (f"<span style='color:green'>✅ {label} saved: "
+                        f"{tok[:4]}…{tok[-4:]}</span>")
+        if on_saved:
+            on_saved(tok)
+
+    btn.on_click(_save)
+    return W.VBox([status, W.HBox([field, btn])]), lambda: _keys().get(key_name, "")
+
+
+def _dest_picker():
+    """Dropdown of model folders + free-text path when 'Custom' is chosen."""
+    import ipywidgets as W
+    dd = W.Dropdown(options=list(FOLDERS.keys()), value="Checkpoints",
+                    description="Save to:", style={"description_width": "80px"},
+                    layout=W.Layout(width="280px"))
+    custom = W.Text(placeholder="/notebooks/custom/path",
+                    layout=W.Layout(width="360px"), disabled=True)
+    dd.observe(lambda ch: setattr(custom, "disabled", ch.new != "Custom"),
+               names="value")
+
+    def path():
+        if dd.value == "Custom":
+            return custom.value.strip()
+        p = FOLDERS[dd.value]
+        p.mkdir(parents=True, exist_ok=True)
+        return str(p)
+
+    return W.HBox([dd, custom]), path
+
+
+# ── Civitai ─────────────────────────────────────────────────────
+_cd_re = re.compile(r'filename\*?=(?:UTF-8\'\')?"?([^";]+)"?', re.IGNORECASE)
+
+
+def _civitai_resolve(url, token):
+    """Accept a model PAGE url or a direct download url; return download url."""
     import requests
-    from tqdm.auto import tqdm
-
-    token = KEYS.get("civitai", "")
-    m = re.search(r"models/(\d+)", url)
-    if m and "download" not in url:
-        v = requests.get(f"https://civitai.com/api/v1/models/{m.group(1)}").json()
-        url = v["modelVersions"][0]["downloadUrl"]
-        print("latest version:", v["modelVersions"][0]["name"])
-    dest = MODELS / folder
-    dest.mkdir(parents=True, exist_ok=True)
-    r = requests.get(url, headers={"Authorization": f"Bearer {token}"} if token else {},
-                     stream=True, allow_redirects=True)
-    r.raise_for_status()
-    name = re.findall('filename="?([^";]+)', r.headers.get("content-disposition", ""))
-    name = name[0] if name else url.split("/")[-1].split("?")[0]
-    total = int(r.headers.get("content-length", 0))
-    with open(dest / name, "wb") as f, tqdm(total=total, unit="B", unit_scale=True,
-                                            desc=name) as bar:
-        for chunk in r.iter_content(1024 * 1024):
-            f.write(chunk)
-            bar.update(len(chunk))
-    print("->", dest / name)
+    m = re.search(r"civitai\.com/models/(\d+)", url)
+    if m and "/api/download/" not in url:
+        r = requests.get(f"https://civitai.com/api/v1/models/{m.group(1)}",
+                         headers={"Authorization": f"Bearer {token}"} if token else {},
+                         timeout=20)
+        r.raise_for_status()
+        v = r.json()["modelVersions"][0]
+        return v["downloadUrl"], v.get("name", "")
+    return url, None
 
 
-def hf_ls(repo):
-    """List a repo's files: hf_ls('Comfy-Org/z_image_turbo')"""
-    from huggingface_hub import list_repo_files
-    for f in list_repo_files(repo, token=KEYS.get("huggingface") or None):
-        print(f)
+def civitai_ui():
+    import ipywidgets as W
+    import requests
+    from IPython.display import display
+
+    out = W.Output()
+    token_ui, get_token = _token_box("civitai", "Civitai")
+
+    url_in = W.Text(placeholder="model page URL or direct download URL",
+                    description="URL:", style={"description_width": "80px"},
+                    layout=W.Layout(width="700px"))
+    dest_ui, dest_path = _dest_picker()
+    btn = W.Button(description="⬇️ Download", button_style="success",
+                   layout=W.Layout(width="130px", height="35px"))
+    bar = W.FloatProgress(value=0, min=0, max=100,
+                          layout=W.Layout(width="700px", visibility="hidden"))
+    lbl = W.HTML()
+
+    def _dl(_):
+        out.clear_output(wait=True)
+        with out:
+            url, token = url_in.value.strip(), get_token()
+            if not url:
+                print("❌ Enter a URL")
+                return
+            try:
+                url, version = _civitai_resolve(url, token)
+                if version:
+                    print(f"latest version: {version}")
+                if "token=" not in url and token:
+                    url += ("&" if "?" in url else "?") + f"token={token}"
+                r = requests.get(url, stream=True, timeout=30,
+                                 headers={"User-Agent": "curl/8"})
+                r.raise_for_status()
+                total = int(r.headers.get("Content-Length") or 0)
+                m = _cd_re.search(r.headers.get("Content-Disposition", ""))
+                name = os.path.basename(urllib.parse.unquote(m.group(1))) if m \
+                    else url.split("/")[-1].split("?")[0] or "model.safetensors"
+                dest = pathlib.Path(dest_path()) / name
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                bar.layout.visibility = "visible"
+                done = 0
+                with open(dest, "wb") as f:
+                    for chunk in r.iter_content(1024 * 1024):
+                        f.write(chunk)
+                        done += len(chunk)
+                        if total:
+                            bar.value = done / total * 100
+                            lbl.value = f"{name}: {_fmt(done)} / {_fmt(total)}"
+                bar.layout.visibility = "hidden"
+                lbl.value = f"✅ {name}"
+                print(f"✅ {name}\n📁 {dest}")
+            except Exception as e:
+                bar.layout.visibility = "hidden"
+                print(f"❌ {e}")
+
+    btn.on_click(_dl)
+    display(W.VBox([W.HTML("<h3>🎨 Civitai Download</h3>"), token_ui,
+                    W.HTML("<hr>"), url_in, dest_ui, btn, bar, lbl, out],
+                   layout=W.Layout(padding="8px")))
 
 
-def hf(repo, file, folder="checkpoints"):
-    """hf('Comfy-Org/z_image_turbo', 'split_files/.../z_image_turbo_bf16.safetensors', 'diffusion_models')"""
-    from huggingface_hub import hf_hub_download
-    dest = MODELS / folder
-    dest.mkdir(parents=True, exist_ok=True)
-    path = hf_hub_download(repo, file, token=KEYS.get("huggingface") or None)
-    target = dest / pathlib.Path(file).name
-    if not target.exists():
-        os.link(path, target)  # hardlink from the HF cache: no duplicated disk
-    print("->", target)
+# ── HuggingFace ─────────────────────────────────────────────────
+def hf_ui():
+    import ipywidgets as W
+    from huggingface_hub import hf_hub_download, list_repo_files
+    from IPython.display import display
+
+    out = W.Output()
+    token_ui, get_token = _token_box("huggingface", "HuggingFace")
+
+    repo_in = W.Text(placeholder="username/repo-name",
+                     layout=W.Layout(width="380px"))
+    type_dd = W.Dropdown(options=["model", "dataset"], value="model",
+                         description="Type:", layout=W.Layout(width="160px"))
+    list_btn = W.Button(description="📋 List files", button_style="info",
+                        layout=W.Layout(width="110px"))
+    files = W.SelectMultiple(options=[], layout=W.Layout(width="700px", height="220px"))
+    dest_ui, dest_path = _dest_picker()
+    dl_btn = W.Button(description="⬇️ Download selected", button_style="success",
+                      layout=W.Layout(width="180px"), disabled=True)
+    bar = W.FloatProgress(min=0, max=100, layout=W.Layout(width="700px"))
+    status = W.HTML()
+
+    def _list(_):
+        out.clear_output(wait=True)
+        with out:
+            repo = repo_in.value.strip()
+            if not repo:
+                status.value = "<span style='color:red'>⚠️ enter a repository</span>"
+                return
+            status.value = "🔍 listing…"
+            try:
+                files.options = list_repo_files(repo, repo_type=type_dd.value,
+                                                token=get_token() or None)
+                dl_btn.disabled = False
+                status.value = f"✅ {len(files.options)} files"
+            except Exception as e:
+                status.value = f"<span style='color:red'>⚠️ {e}</span>"
+
+    def _dl(_):
+        out.clear_output(wait=True)
+        with out:
+            sel = list(files.value)
+            if not sel:
+                status.value = "<span style='color:red'>⚠️ select files first</span>"
+                return
+            dest = pathlib.Path(dest_path())
+            dest.mkdir(parents=True, exist_ok=True)
+            for i, fname in enumerate(sel, 1):
+                bar.value = (i - 1) / len(sel) * 100
+                print(f"⬇️ [{i}/{len(sel)}] {fname}")
+                try:
+                    cached = hf_hub_download(repo_in.value.strip(), fname,
+                                             repo_type=type_dd.value,
+                                             token=get_token() or None)
+                    target = dest / pathlib.Path(fname).name
+                    if not target.exists():
+                        try:
+                            os.link(cached, target)   # no duplicated disk
+                        except OSError:
+                            shutil.copy2(cached, target)
+                    print(f"✅ {target.name}")
+                except Exception as e:
+                    print(f"❌ {e}")
+            bar.value = 100
+            status.value = f"✅ done — saved to {dest}"
+
+    list_btn.on_click(_list)
+    dl_btn.on_click(_dl)
+    display(W.VBox([W.HTML("<h3>🤗 HuggingFace Download</h3>"), token_ui,
+                    W.HTML("<hr>"), W.HBox([repo_in, type_dd, list_btn]),
+                    files, dest_ui, dl_btn, bar, status, out]))
 
 
-# ── disk ────────────────────────────────────────────────────────
-def disk():
-    """Size per folder under ComfyUI/models + output + HF cache."""
-    dirs = sorted(MODELS.glob("*")) + [ROOT / "ComfyUI" / "output",
-                                       ROOT / "huggingface_cache"]
-    for d in dirs:
-        if d.is_dir():
-            size = sum(f.stat().st_size for f in d.rglob("*") if f.is_file())
-            if size > 1e6:
-                print(f"{size/1e9:7.2f} GB  {d}")
+# ── Cleaner ─────────────────────────────────────────────────────
+def _dir_size(path):
+    total = 0
+    for p in pathlib.Path(path).rglob("*"):
+        try:
+            if p.is_file() or p.is_symlink():
+                total += p.lstat().st_size
+        except OSError:
+            pass
+    return total
 
 
-def rm(path):
-    """Delete a file or folder (use the full path printed by disk())."""
-    import shutil
-    p = pathlib.Path(path)
-    assert str(p).startswith("/notebooks/"), "only inside /notebooks"
-    shutil.rmtree(p) if p.is_dir() else p.unlink()
-    print("deleted", p)
+def cleaner_ui():
+    import ipywidgets as W
+    from IPython.display import display
+
+    roots = {
+        "models": MODELS, "output": ROOT / "ComfyUI" / "output",
+        "input": ROOT / "ComfyUI" / "input", "temp": ROOT / "ComfyUI" / "temp",
+        "hf cache": ROOT / "huggingface_cache", "trash": ROOT / ".Trash-0",
+    }
+
+    def _allowed(p):
+        p = pathlib.Path(p).resolve()
+        return any(str(p) == str(r.resolve()) or str(p).startswith(str(r.resolve()) + os.sep)
+                   for r in roots.values() if r.exists())
+
+    def folder_options():
+        opts = []
+        if MODELS.is_dir():
+            for sub in sorted(MODELS.iterdir()):
+                if sub.is_dir():
+                    opts.append((f"models/{sub.name}  —  {_fmt(_dir_size(sub))}", str(sub)))
+        for name, p in roots.items():
+            if name != "models" and p.is_dir():
+                opts.append((f"{name}  —  {_fmt(_dir_size(p))}", str(p)))
+        return opts
+
+    def list_items(path):
+        opts = []
+        p = pathlib.Path(path)
+        if p.is_dir():
+            for e in sorted(p.iterdir(), key=lambda x: x.name.lower()):
+                size = _dir_size(e) if e.is_dir() else e.lstat().st_size
+                tag = "DIR" if e.is_dir() else "FILE"
+                opts.append((f"[{tag}] {e.name}  —  {_fmt(size)}", str(e)))
+        return opts
+
+    folder_dd = W.Dropdown(options=folder_options(), description="📁 Folder:",
+                           style={"description_width": "90px"},
+                           layout=W.Layout(width="700px"))
+    mode = W.ToggleButtons(
+        options=[("🗑️ Delete selected items (SAFE)", "items"),
+                 ("⚠️ Empty whole folder (DANGEROUS)", "clean")],
+        value="items", layout=W.Layout(width="700px"))
+    items = W.SelectMultiple(options=[], description="📋 Items:",
+                             style={"description_width": "70px"},
+                             layout=W.Layout(width="860px", height="260px"))
+    sel_all = W.ToggleButtons(options=[("✅ Select all", "all"), ("❌ None", "none")],
+                              button_style="info", layout=W.Layout(width="320px"))
+    refresh = W.Button(description="🔄 Refresh", button_style="info",
+                       layout=W.Layout(width="120px", height="32px"))
+    confirm = W.Checkbox(description="✔️ I confirm the deletion", indent=False)
+    run = W.Button(description="🗑️ RUN CLEANUP", button_style="danger",
+                   disabled=True, layout=W.Layout(width="220px", height="40px"))
+    logw = W.Output(layout=W.Layout(max_height="240px", overflow="auto",
+                                    border="1px solid #555", padding="8px"))
+
+    def _refresh_items(_=None):
+        items.options = list_items(folder_dd.value)
+        items.value = ()
+        _gate(None)
+
+    def _refresh_all(_=None):
+        folder_dd.options = folder_options()
+        _refresh_items()
+
+    def _gate(_):
+        ok = folder_dd.value and _allowed(folder_dd.value) and confirm.value
+        run.disabled = not (ok and (mode.value == "clean" or items.value))
+
+    def _sel(ch):
+        items.value = tuple(v for _, v in items.options) if ch["new"] == "all" else ()
+
+    def _delete(p):
+        p = pathlib.Path(p)
+        if p.is_dir() and not p.is_symlink():
+            shutil.rmtree(p, onerror=lambda f, x, e: (os.chmod(x, 0o700), f(x)))
+        else:
+            p.unlink(missing_ok=True)
+
+    def _run(_):
+        path = folder_dd.value
+        if not _allowed(path):
+            with logw:
+                print(f"[{_now()}] ❌ path not allowed")
+            return
+        with logw:
+            if mode.value == "clean":
+                print(f"[{_now()}] 🧹 emptying {path}")
+                for child in pathlib.Path(path).iterdir():
+                    try:
+                        _delete(child)
+                    except Exception as e:
+                        print(f"   ⚠️ {child.name}: {e}")
+                print(f"[{_now()}] ✅ emptied")
+            else:
+                for it in items.value:
+                    try:
+                        _delete(it)
+                        print(f"[{_now()}] ✅ deleted {it}")
+                    except Exception as e:
+                        print(f"[{_now()}] ❌ {it}: {e}")
+        _refresh_all()
+
+    refresh.on_click(_refresh_all)
+    folder_dd.observe(_refresh_items, names="value")
+    sel_all.observe(_sel, names="value")
+    for w in (items, mode, confirm):
+        w.observe(_gate, names="value")
+    run.on_click(_run)
+
+    display(W.VBox([W.HTML("<h3>🧹 Cleaner</h3>"), folder_dd, mode,
+                    W.HBox([sel_all, refresh]), items, confirm, run, logw]))
+    _refresh_items()
 
 
-# ── Cloudflare R2 (optional) ────────────────────────────────────
-def _r2():
+# ── Cloudflare R2 ───────────────────────────────────────────────
+def _r2_cfg():
+    return _keys().get("r2", {})
+
+
+def _r2_client():
     import boto3
-    c = KEYS["r2"]
-    return (boto3.client("s3",
-                         endpoint_url=f"https://{c['account_id']}.r2.cloudflarestorage.com",
-                         aws_access_key_id=c["access_key_id"],
-                         aws_secret_access_key=c["secret_access_key"]),
-            c["bucket"])
+    c = _r2_cfg()
+    endpoint = c.get("endpoint_url") or (
+        f"https://{c['account_id']}.r2.cloudflarestorage.com" if c.get("account_id") else None)
+    return boto3.client("s3", endpoint_url=endpoint, region_name="auto",
+                        aws_access_key_id=c.get("access_key_id"),
+                        aws_secret_access_key=c.get("secret_access_key")), c.get("bucket")
 
 
-def r2_ls(prefix=""):
-    s3, bucket = _r2()
-    for o in s3.list_objects_v2(Bucket=bucket, Prefix=prefix).get("Contents", []):
-        print(f"{o['Size']/1e9:7.2f} GB  {o['Key']}")
+def _r2_folders():
+    try:
+        s3, bucket = _r2_client()
+        r = s3.list_objects_v2(Bucket=bucket, Delimiter="/")
+        return sorted(p["Prefix"].rstrip("/") for p in r.get("CommonPrefixes", []))
+    except Exception:
+        return []
 
 
-def r2_get(key, folder="checkpoints"):
-    """r2_get('loras/mystyle.safetensors', 'loras')"""
-    s3, bucket = _r2()
-    dest = MODELS / folder / pathlib.Path(key).name
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    s3.download_file(bucket, key, str(dest))
-    print("->", dest)
+def r2_ui():
+    import ipywidgets as W
+    from IPython.display import display
 
+    # -- Config tab --
+    c = _r2_cfg()
+    endpoint_in = W.Text(value=c.get("endpoint_url", ""),
+                         placeholder="https://<account_id>.r2.cloudflarestorage.com",
+                         description="Endpoint:", style={"description_width": "100px"},
+                         layout=W.Layout(width="620px"))
+    access_in = W.Text(value=c.get("access_key_id", ""), description="Access key:",
+                       style={"description_width": "100px"}, layout=W.Layout(width="520px"))
+    secret_in = W.Password(value=c.get("secret_access_key", ""), description="Secret:",
+                           style={"description_width": "100px"}, layout=W.Layout(width="520px"))
+    bucket_in = W.Text(value=c.get("bucket", ""), description="Bucket:",
+                       style={"description_width": "100px"}, layout=W.Layout(width="380px"))
+    cfg_status = W.HTML(f"<span style='color:green'>✅ bucket: {c['bucket']}</span>"
+                        if c.get("bucket") else
+                        "<span style='color:orange'>⚠️ not configured</span>")
+    cfg_btn = W.Button(description="💾 Save config", button_style="success",
+                       layout=W.Layout(width="150px", height="34px"))
+    cfg_out = W.Output()
 
-def r2_put(path, key=None):
-    """r2_put('/notebooks/ComfyUI/output/img.png')"""
-    s3, bucket = _r2()
-    p = pathlib.Path(path)
-    s3.upload_file(str(p), bucket, key or p.name)
-    print("->", f"r2://{bucket}/{key or p.name}")
+    def _cfg_save(_):
+        cfg_out.clear_output(wait=True)
+        with cfg_out:
+            if not all([endpoint_in.value, access_in.value, secret_in.value, bucket_in.value]):
+                print("❌ all fields required")
+                return
+            _save_key("r2", {"endpoint_url": endpoint_in.value.strip(),
+                             "access_key_id": access_in.value.strip(),
+                             "secret_access_key": secret_in.value.strip(),
+                             "bucket": bucket_in.value.strip()})
+            cfg_status.value = f"<span style='color:green'>✅ bucket: {bucket_in.value}</span>"
+            print("✅ saved")
+
+    cfg_btn.on_click(_cfg_save)
+    cfg_tab = W.VBox([cfg_status, W.HTML("<hr>"), endpoint_in, access_in,
+                      secret_in, bucket_in, cfg_btn, cfg_out])
+
+    # -- Upload tab --
+    up_out = W.Output()
+    up_path = W.Text(placeholder="/notebooks/ComfyUI/models/loras/file.safetensors",
+                     description="File:", style={"description_width": "80px"},
+                     layout=W.Layout(width="560px"))
+    up_folder = W.Dropdown(options=_r2_folders() or [""], description="R2 folder:",
+                           style={"description_width": "80px"},
+                           layout=W.Layout(width="300px"))
+    up_btn = W.Button(description="⬆️ Upload", button_style="success",
+                      layout=W.Layout(width="110px", height="34px"))
+    up_force = W.Button(description="✅ Overwrite", button_style="warning",
+                        layout=W.Layout(width="110px", height="34px", visibility="hidden"))
+    up_bar = W.FloatProgress(min=0, max=100, layout=W.Layout(width="560px",
+                                                             visibility="hidden"))
+    up_lbl = W.HTML()
+
+    def _upload(force):
+        up_out.clear_output(wait=True)
+        with up_out:
+            p = pathlib.Path(up_path.value.strip())
+            if not p.exists():
+                print(f"❌ not found: {p}")
+                return
+            s3, bucket = _r2_client()
+            key = f"{up_folder.value}/{p.name}" if up_folder.value else p.name
+            if not force:
+                try:
+                    s3.head_object(Bucket=bucket, Key=key)
+                    print(f"⚠️ already exists: {key} — use Overwrite")
+                    up_force.layout.visibility = "visible"
+                    return
+                except Exception:
+                    pass
+            size = p.stat().st_size
+            state = {"done": 0}
+            up_bar.layout.visibility = "visible"
+
+            def cb(n):
+                state["done"] += n
+                pct = state["done"] / size * 100
+                up_bar.value = pct
+                up_lbl.value = f"{p.name}: {_fmt(state['done'])} / {_fmt(size)}"
+
+            s3.upload_file(str(p), bucket, key, Callback=cb)
+            up_bar.layout.visibility = "hidden"
+            up_force.layout.visibility = "hidden"
+            up_lbl.value = f"✅ {key}"
+            print(f"✅ uploaded: {key}")
+
+    up_btn.on_click(lambda _: _upload(False))
+    up_force.on_click(lambda _: _upload(True))
+    up_tab = W.VBox([up_path, up_folder, W.HBox([up_btn, up_force]),
+                     up_bar, up_lbl, up_out])
+
+    # -- Download tab --
+    dl_out = W.Output()
+    dl_folder = W.Dropdown(options=_r2_folders() or [""], description="R2 folder:",
+                           style={"description_width": "80px"},
+                           layout=W.Layout(width="300px"))
+    dl_search = W.Text(placeholder="search…", description="Search:",
+                       style={"description_width": "80px"},
+                       layout=W.Layout(width="280px"))
+    dl_list_btn = W.Button(description="📋 List", button_style="info",
+                           layout=W.Layout(width="90px"))
+    dl_files = W.SelectMultiple(options=[], layout=W.Layout(width="700px", height="220px"))
+    dest_ui, dest_path = _dest_picker()
+    dl_btn = W.Button(description="⬇️ Download selected", button_style="primary",
+                      layout=W.Layout(width="180px", height="34px"))
+    dl_bar = W.FloatProgress(min=0, max=100, layout=W.Layout(width="700px",
+                                                             visibility="hidden"))
+    dl_lbl = W.HTML()
+
+    def _dl_list(_):
+        dl_out.clear_output(wait=True)
+        with dl_out:
+            s3, bucket = _r2_client()
+            prefix = f"{dl_folder.value}/" if dl_folder.value else ""
+            try:
+                r = s3.list_objects_v2(Bucket=bucket, Prefix=prefix)
+                opts = []
+                for o in r.get("Contents", []):
+                    if o["Key"].endswith("/"):
+                        continue
+                    if dl_search.value and dl_search.value.lower() not in o["Key"].lower():
+                        continue
+                    when = o["LastModified"].strftime("%Y-%m-%d %H:%M")
+                    opts.append((f"{o['Key'].split('/')[-1]}  ({_fmt(o['Size'])})  {when}",
+                                 o["Key"]))
+                dl_files.options = opts
+                print(f"✅ {len(opts)} files")
+            except Exception as e:
+                print(f"❌ {e}")
+
+    def _dl_go(_):
+        dl_out.clear_output(wait=True)
+        with dl_out:
+            sel = list(dl_files.value)
+            if not sel:
+                print("❌ select files first")
+                return
+            s3, bucket = _r2_client()
+            dest = pathlib.Path(dest_path())
+            dest.mkdir(parents=True, exist_ok=True)
+            dl_bar.layout.visibility = "visible"
+            ok = 0
+            for i, key in enumerate(sel, 1):
+                try:
+                    size = s3.head_object(Bucket=bucket, Key=key)["ContentLength"]
+                    state = {"done": 0, "last": -1}
+
+                    def cb(n, size=size, key=key, i=i, state=state):
+                        state["done"] += n
+                        pct = state["done"] / size * 100
+                        if pct - state["last"] >= 0.5 or state["done"] >= size:
+                            state["last"] = pct
+                            dl_bar.value = pct
+                            dl_lbl.value = (f"[{i}/{len(sel)}] {key.split('/')[-1]}: "
+                                            f"{_fmt(state['done'])} / {_fmt(size)}")
+
+                    s3.download_file(bucket, key, str(dest / key.split("/")[-1]),
+                                     Callback=cb)
+                    print(f"✅ {key}")
+                    ok += 1
+                except Exception as e:
+                    print(f"❌ {key}: {e}")
+            dl_bar.layout.visibility = "hidden"
+            dl_lbl.value = f"✅ {ok}/{len(sel)} downloaded to {dest}"
+
+    dl_list_btn.on_click(_dl_list)
+    dl_btn.on_click(_dl_go)
+    dl_tab = W.VBox([W.HBox([dl_folder, dl_search, dl_list_btn]), dl_files,
+                     dest_ui, dl_btn, dl_bar, dl_lbl, dl_out])
+
+    tabs = W.Tab(children=[cfg_tab, up_tab, dl_tab])
+    for i, t in enumerate(["⚙️ Config", "⬆️ Upload", "⬇️ Download"]):
+        tabs.set_title(i, t)
+    display(W.VBox([W.HTML("<h3>☁️ Cloudflare R2</h3>"), tabs]))

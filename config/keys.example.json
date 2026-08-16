@@ -2,7 +2,7 @@
   "civitai": "",
   "huggingface": "",
   "r2": {
-    "account_id": "",
+    "endpoint_url": "https://<account_id>.r2.cloudflarestorage.com",
     "access_key_id": "",
     "secret_access_key": "",
     "bucket": ""
