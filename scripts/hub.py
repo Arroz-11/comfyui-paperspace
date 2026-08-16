@@ -222,6 +222,29 @@ def civitai_ui():
 
 
 # ── HuggingFace ─────────────────────────────────────────────────
+def hf_check(repo, token=None):
+    """Can this token download that repo? Handles gated models (FLUX etc.).
+
+    Returns (status, message) where status is 'ok' | 'gated' | 'not-found'.
+    """
+    from huggingface_hub import list_repo_files
+    from huggingface_hub.errors import (GatedRepoError, RepositoryNotFoundError)
+    token = token if token is not None else (_keys().get("huggingface") or None)
+    try:
+        list_repo_files(repo, token=token)
+        return "ok", f"✅ access OK — you can download {repo}"
+    except GatedRepoError:
+        return "gated", (f"🔒 {repo} is gated and this token has NOT been "
+                         f"granted access.\n   Accept the license at "
+                         f"https://huggingface.co/{repo} (button on the page), "
+                         f"then try again.")
+    except RepositoryNotFoundError:
+        return "not-found", (f"❌ {repo} not found — wrong name, or it's private "
+                             f"and this token can't see it.")
+    except Exception as e:
+        return "error", f"⚠️ {e}"
+
+
 def hf_ui():
     import ipywidgets as W
     from huggingface_hub import hf_hub_download, list_repo_files
@@ -236,6 +259,9 @@ def hf_ui():
                          description="Type:", layout=W.Layout(width="160px"))
     list_btn = W.Button(description="📋 List files", button_style="info",
                         layout=W.Layout(width="110px"))
+    check_btn = W.Button(description="🔓 Check access", button_style="warning",
+                         layout=W.Layout(width="130px"),
+                         tooltip="Gated models (FLUX…) need their license accepted")
     files = W.SelectMultiple(options=[], layout=W.Layout(width="700px", height="220px"))
     dest_ui, dest_path = _dest_picker()
     dl_btn = W.Button(description="⬇️ Download selected", button_style="success",
@@ -299,10 +325,24 @@ def hf_ui():
             bar.value = 100
             status.value = f"✅ done — saved to {dest}"
 
+    def _check(_):
+        out.clear_output(wait=True)
+        with out:
+            repo = repo_in.value.strip()
+            if not repo:
+                status.value = "<span style='color:red'>⚠️ enter a repository</span>"
+                return
+            status.value = "🔍 checking access…"
+            code, msg = hf_check(repo, get_token() or None)
+            color = {"ok": "green", "gated": "orange"}.get(code, "red")
+            status.value = f"<span style='color:{color}'>{msg.splitlines()[0]}</span>"
+            print(msg)
+
     list_btn.on_click(_list)
+    check_btn.on_click(_check)
     dl_btn.on_click(_dl)
     display(W.VBox([W.HTML("<h3>🤗 HuggingFace Download</h3>"), token_ui,
-                    W.HTML("<hr>"), W.HBox([repo_in, type_dd, list_btn]),
+                    W.HTML("<hr>"), W.HBox([repo_in, type_dd, list_btn, check_btn]),
                     files, dest_ui, dl_btn, bar, status, out]))
 
 
@@ -346,6 +386,8 @@ def cleaner_ui():
 
     def list_items(path):
         opts = []
+        if not path:   # fresh machine: no folders yet -> empty list, not a crash
+            return opts
         p = pathlib.Path(path)
         if p.is_dir():
             for e in sorted(p.iterdir(), key=lambda x: x.name.lower()):
