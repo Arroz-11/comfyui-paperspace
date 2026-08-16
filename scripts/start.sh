@@ -121,7 +121,9 @@ if pgrep -f "python.*main.py" > /dev/null; then
     echo "  already running"
 else
     cd "$COMFY"
-    nohup bash -c "source '$VENV/bin/activate' && python main.py --listen --port 6006 --disable-metadata" \
+    # MPLBACKEND=Agg: safe headless matplotlib backend no matter who launched us
+    # (the Jupyter kernel leaks an inline backend that breaks matplotlib nodes)
+    nohup bash -c "source '$VENV/bin/activate' && MPLBACKEND=Agg python main.py --listen --port 6006 --disable-metadata" \
         > "$ROOT/logs/comfyui.log" 2>&1 &
     echo "  launched (PID $!) — log: $ROOT/logs/comfyui.log"
 fi

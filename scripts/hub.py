@@ -63,9 +63,13 @@ def _now():
 # ── ComfyUI control ─────────────────────────────────────────────
 COMFY = ROOT / "ComfyUI"
 VENV_ACT = COMFY / "comfyenv" / "bin" / "activate"
-# Keep in sync with start.sh step 6
-_COMFY_CMD = ("cd '{c}' && source '{v}' && nohup python main.py --listen "
-              "--port 6006 --disable-metadata > '{log}' 2>&1 &")
+# Keep in sync with start.sh step 6.
+# MPLBACKEND=Agg: when launched from the notebook, the Jupyter kernel leaks
+# MPLBACKEND=module://matplotlib_inline... into the child; the venv's matplotlib
+# rejects it and every node importing matplotlib dies (Detail-Daemon, RES4LYF,
+# LayerStyle, Impact-Subpack, RMBG, Comfyroll). Agg = headless-safe everywhere.
+_COMFY_CMD = ("cd '{c}' && source '{v}' && MPLBACKEND=Agg nohup python main.py "
+              "--listen --port 6006 --disable-metadata > '{log}' 2>&1 &")
 
 
 def _comfy_running():

@@ -58,6 +58,22 @@ persistent storage — it is git-ignored and never leaves it.
 └── logs/               ← boot.log + comfyui.log (fresh on every boot)
 ```
 
+## Known log noise (harmless — don't chase these)
+
+| Line | Meaning |
+|---|---|
+| `No OpenGL_accelerate module loaded` | optional speedup lib, nothing breaks |
+| `No module named 'llama_cpp'` (QwenVL GGUF enhancer) | only the GGUF variant of one node — install `llama-cpp-python` only if you use it |
+| `You need pytorch with cu130 or higher…` | runs fine on cu128 |
+| rgthree's "Node 2.0 rendering" essay | the author's opinion, not an error |
+| `timm.models.layers is deprecated` | upstream deprecation warning |
+| WAS `ffmpeg_bin_path is not set` | falls back to system ffmpeg (start.sh installs it) |
+| `pynvml package is deprecated` | cosmetic |
+
+If a node shows `IMPORT FAILED` with a *matplotlib backend* error, you launched
+ComfyUI from a Jupyter kernel without the `MPLBACKEND=Agg` guard — update the
+repo, the launcher sets it now.
+
 ## Notes
 
 - Only `/notebooks` survives a shutdown — that's why system packages reinstall
