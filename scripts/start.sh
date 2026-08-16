@@ -99,13 +99,16 @@ if [ -f "$ROOT/config/nodes.txt" ]; then
     step "5b/6 custom nodes"
     # shellcheck disable=SC1091
     source "$VENV/bin/activate"
-    while IFS= read -r url; do
-        case "$url" in ''|\#*) continue ;; esac
+    while IFS= read -r line || [ -n "$line" ]; do
+        # keep only the URL: drop trailing comments and any whitespace/CR
+        url="${line%%#*}"
+        url="$(echo "$url" | tr -d '[:space:]')"
+        [ -z "$url" ] && continue
         name=$(basename "$url" .git)
         dir="$COMFY/custom_nodes/$name"
         if [ ! -d "$dir" ]; then
             echo "  + $name"
-            git clone -q "$url" "$dir" || { echo "    ⚠ clone failed"; continue; }
+            git clone -q "$url" "$dir" || { echo "    ⚠ clone failed: $url"; continue; }
             [ -f "$dir/requirements.txt" ] && pip install -q -r "$dir/requirements.txt" || true
         fi
     done < "$ROOT/config/nodes.txt"
