@@ -29,16 +29,12 @@ https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git    # 14
 # ── sampling / generation ───────────────────────────────────
 https://github.com/ClownsharkBatwing/RES4LYF.git                 # 92 (ClownsharKSampler)
 https://github.com/rgthree/rgthree-comfy.git                     # 91 (Power Lora Loader)
+https://github.com/capitan01R/Comfyui-ZiT-Lora-loader.git        # 42 (LoRAs de Z-Image Turbo)
 https://github.com/Jonseed/ComfyUI-Detail-Daemon.git             # 28
 https://github.com/badjeff/comfyui_lora_tag_loader.git           # 23
 
 # ── monitoring (no workflow nodes, just useful) ─────────────
 https://github.com/crystian/ComfyUI-Crystools.git
-
-# ── PRIVATE / to verify — install by hand or fix the URL ────
-# comfyui-just-nodes                                             # 368 (!) — Agustin's private node: presets/prompt stack
-# comfyui-flux2klein-enhancer                                    # 81 — verify where this repo lives
-# comfyui-zit-lora-loader                                        # 42 — verify where this repo lives
 
 # ── occasional — uncomment when a workflow needs them ───────
 # https://github.com/Fannovel16/comfyui_controlnet_aux.git       # 32
