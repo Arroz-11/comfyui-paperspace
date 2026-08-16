@@ -572,16 +572,22 @@ def presets_ui():
                     if code == "gated":
                         return
             bar.layout.visibility = "visible"
-            for i, f in enumerate(todo, 1):
-                name = pathlib.Path(f["file"]).name
-                bar.value = (i - 1) / len(todo) * 100
-                lbl.value = f"[{i}/{len(todo)}] {name} ({f['gb']:.2f} GB)…"
-                print(f"⬇️ [{i}/{len(todo)}] {name}")
-                try:
-                    target, downloaded = _hf_fetch(f["repo"], f["file"], f["folder"], token)
-                    print(f"   {'✅ downloaded' if downloaded else '✓ already there'}: {target}")
-                except Exception as e:
-                    print(f"   ❌ {e}")
+            # HF's own progress bars are noisy (split_files/... names, double
+            # bars) — silence them; our bar + label carry the progress.
+            from huggingface_hub.utils import disable_progress_bars, enable_progress_bars
+            disable_progress_bars()
+            try:
+                for i, f in enumerate(todo, 1):
+                    name = pathlib.Path(f["file"]).name
+                    bar.value = (i - 1) / len(todo) * 100
+                    lbl.value = f"⬇️ [{i}/{len(todo)}] {name} ({f['gb']:.2f} GB)…"
+                    try:
+                        _hf_fetch(f["repo"], f["file"], f["folder"], token)
+                        print(f"✅ {name} → {f['folder']}")
+                    except Exception as e:
+                        print(f"❌ {name}: {e}")
+            finally:
+                enable_progress_bars()
             bar.value = 100
             bar.layout.visibility = "hidden"
             lbl.value = "✅ done"

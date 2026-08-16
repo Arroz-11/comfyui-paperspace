@@ -2,7 +2,7 @@
   "_comment": "Model presets for Hub.ipynb — every entry verified against the HF API (2026-08-16: file exists + real size). Edit this file to add presets; folder = subfolder of ComfyUI/models.",
   "z-image-turbo": {
     "name": "Z Image Turbo",
-    "about": "SFW generation, 6B",
+    "about": "Fast text-to-image, 6B",
     "variants": {
       "bf16": [
         {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors", "folder": "diffusion_models", "gb": 12.31},
