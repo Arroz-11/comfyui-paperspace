@@ -60,17 +60,151 @@ def _now():
     return datetime.now().strftime("%H:%M:%S")
 
 
-# ── ComfyUI link ────────────────────────────────────────────────
+# ── ComfyUI control ─────────────────────────────────────────────
+COMFY = ROOT / "ComfyUI"
+VENV_ACT = COMFY / "comfyenv" / "bin" / "activate"
+# Keep in sync with start.sh step 6
+_COMFY_CMD = ("cd '{c}' && source '{v}' && nohup python main.py --listen "
+              "--port 6006 --disable-metadata > '{log}' 2>&1 &")
+
+
+def _comfy_running():
+    try:
+        return subprocess.run(["pgrep", "-f", "python.*main.py"],
+                              capture_output=True).returncode == 0
+    except FileNotFoundError:   # not on linux (local testing)
+        return False
+
+
+def _git(*args):
+    r = subprocess.run(["git", "-C", str(COMFY), *args],
+                       capture_output=True, text=True)
+    return r.returncode, (r.stdout or r.stderr).strip()
+
+
+def comfy_start():
+    if _comfy_running():
+        return "already running"
+    (ROOT / "logs").mkdir(exist_ok=True)
+    subprocess.Popen(["bash", "-c", _COMFY_CMD.format(
+        c=COMFY, v=VENV_ACT, log=ROOT / "logs" / "comfyui.log")],
+        start_new_session=True)
+    return "starting — give it ~30-60s, then Refresh"
+
+
+def comfy_stop():
+    subprocess.run(["pkill", "-f", "python.*main.py"], capture_output=True)
+    return "stopped"
+
+
+def comfy_version():
+    """(current, commits_behind_or_None). Fetches origin quietly."""
+    _, desc = _git("describe", "--tags", "--always")
+    code, _ = _git("fetch", "-q", "origin", "master")
+    if code != 0:
+        return desc, None
+    _, behind = _git("rev-list", "--count", "HEAD..origin/master")
+    return desc, int(behind) if behind.isdigit() else None
+
+
+def comfy_update():
+    """Same steps as the old manage.sh: stash if dirty, pull master, reqs."""
+    yield "updating ComfyUI…"
+    code, dirty = _git("status", "--porcelain")
+    if dirty:
+        _git("stash")
+        yield "  (local changes stashed)"
+    _git("checkout", "-q", "master")
+    code, out = _git("pull", "--ff-only")
+    yield f"  {out.splitlines()[-1] if out else 'pulled'}"
+    r = subprocess.run(["bash", "-c",
+                        f"source '{VENV_ACT}' && pip install -q -r '{COMFY}/requirements.txt'"],
+                       capture_output=True, text=True)
+    yield "  requirements ok" if r.returncode == 0 else f"  ⚠ pip: {r.stderr.strip()[-200:]}"
+    _, desc = _git("describe", "--tags", "--always")
+    yield f"✅ now at {desc} — Stop + Start to apply"
+
+
 def link():
-    """Show the ComfyUI URL (and whether it's actually running)."""
+    """Plain-text status + URL (used by scripts; the panel supersedes it)."""
     fqdn = os.environ.get("PAPERSPACE_FQDN", "")
-    up = subprocess.run(["pgrep", "-f", "python.*main.py"],
-                        capture_output=True).returncode == 0
-    if not up:
-        print("⚫ ComfyUI is not running — start it with: bash /notebooks/scripts/start.sh")
+    if not _comfy_running():
+        print("⚫ ComfyUI is not running")
         return
-    print("🟢 ComfyUI is running")
-    print(f"https://tensorboard-{fqdn}")
+    print(f"🟢 https://tensorboard-{fqdn}")
+
+
+def comfy_panel():
+    """The ComfyUI cell: status + link + start/stop/version/update buttons."""
+    import ipywidgets as W
+    from IPython.display import display
+
+    fqdn = os.environ.get("PAPERSPACE_FQDN", "")
+    url = f"https://tensorboard-{fqdn}"
+    status = W.HTML()
+    version = W.HTML()
+    out = W.Output(layout=W.Layout(max_height="160px", overflow="auto"))
+
+    def _refresh(_=None):
+        if _comfy_running():
+            status.value = (f"🟢 <b>running</b> — "
+                            f"<a href='{url}' target='_blank' "
+                            f"style='color:#60a5fa'>{url}</a>")
+        else:
+            status.value = "⚫ <b>not running</b>"
+
+    def _msg(text):
+        out.clear_output(wait=True)
+        with out:
+            print(text)
+
+    start_b = W.Button(description="▶ Start", button_style="success",
+                       layout=W.Layout(width="110px", height="34px"))
+    stop_b = W.Button(description="⏹ Stop", button_style="danger",
+                      layout=W.Layout(width="110px", height="34px"))
+    refresh_b = W.Button(description="🔄 Refresh", layout=W.Layout(width="110px", height="34px"))
+    check_b = W.Button(description="🔍 Check version", button_style="info",
+                       layout=W.Layout(width="140px", height="34px"))
+    update_b = W.Button(description="⬆️ Update ComfyUI", button_style="warning",
+                        layout=W.Layout(width="160px", height="34px"))
+
+    def _start(_):
+        _msg(comfy_start())
+        _refresh()
+
+    def _stop(_):
+        _msg(comfy_stop())
+        _refresh()
+
+    def _check(_):
+        version.value = "🔍 checking…"
+        desc, behind = comfy_version()
+        if behind is None:
+            version.value = f"version <b>{desc}</b> (couldn't reach origin)"
+        elif behind == 0:
+            version.value = f"version <b>{desc}</b> — ✅ up to date"
+        else:
+            version.value = (f"version <b>{desc}</b> — ⬆️ <b>{behind} commits "
+                             f"behind</b>: press Update ComfyUI")
+
+    def _update(_):
+        out.clear_output(wait=True)
+        with out:
+            for line in comfy_update():
+                print(line)
+        _check(None)
+        _refresh()
+
+    start_b.on_click(_start)
+    stop_b.on_click(_stop)
+    refresh_b.on_click(_refresh)
+    check_b.on_click(_check)
+    update_b.on_click(_update)
+
+    _refresh()
+    display(W.VBox([status, version,
+                    W.HBox([start_b, stop_b, refresh_b, check_b, update_b]),
+                    out]))
 
 
 def log(name="boot", lines=40):
