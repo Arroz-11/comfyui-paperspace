@@ -1,37 +1,51 @@
 # Custom nodes — one git URL per line. start.sh clones the missing ones on
 # every boot (and installs each node's requirements.txt if it has one).
-# Lines starting with # are ignored. Delete a line = it stops installing on
-# new machines (existing installs keep it until you remove the folder).
+# Lines starting with # are ignored.
+#
+# Ranked from real usage: 408 workflows from the 2026 backups, weighted by
+# recency (score in comments = weighted count of workflows using the pack).
 
-# ── essentials ──────────────────────────────────────────────
+# ── core — in almost every workflow ─────────────────────────
 https://github.com/Comfy-Org/ComfyUI-Manager.git
-https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
-https://github.com/rgthree/rgthree-comfy.git
-https://github.com/cubiq/ComfyUI_essentials.git
-https://github.com/kijai/ComfyUI-KJNodes.git
-https://github.com/yolain/ComfyUI-Easy-Use.git
+https://github.com/cubiq/ComfyUI_essentials.git                  # 332
+https://github.com/WASasquatch/was-node-suite-comfyui.git        # 319 — if Numba error: fixes.sh numpy
+https://github.com/TinyTerra/ComfyUI_tinyterraNodes.git          # 234 (ttN hiresfixScale)
+https://github.com/MohammadAboulEla/ComfyUI-iTools.git           # 233 (compare image)
+https://github.com/yolain/ComfyUI-Easy-Use.git                   # 212
+https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git             # 202 (image lists)
+https://github.com/1038lab/ComfyUI-QwenVL.git                    # 187 (captioning actual)
+https://github.com/ltdrdata/ComfyUI-Impact-Pack.git              # 179
+https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git      # 169
+https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git      # 195 (both cnr ids)
+
+# ── image / mask / faces ────────────────────────────────────
+https://github.com/chflame163/ComfyUI_LayerStyle_Advance.git     # 104 — JoyCaption2 needs fixes.sh joycaption
+https://github.com/chflame163/ComfyUI_LayerStyle.git             # 49 (text utils; Advance depends on it)
+https://github.com/cubiq/ComfyUI_FaceAnalysis.git                # 102 — insightface: slow first build
+https://github.com/1038lab/ComfyUI-RMBG.git                      # 48
+https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git           # 29 (Ultralytics detector)
+https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git    # 14
+
+# ── sampling / generation ───────────────────────────────────
+https://github.com/ClownsharkBatwing/RES4LYF.git                 # 92 (ClownsharKSampler)
+https://github.com/rgthree/rgthree-comfy.git                     # 91 (Power Lora Loader)
+https://github.com/Jonseed/ComfyUI-Detail-Daemon.git             # 28
+https://github.com/badjeff/comfyui_lora_tag_loader.git           # 23
+
+# ── monitoring (no workflow nodes, just useful) ─────────────
 https://github.com/crystian/ComfyUI-Crystools.git
 
-# ── generation / samplers ───────────────────────────────────
-https://github.com/city96/ComfyUI-GGUF.git
-https://github.com/ClownsharkBatwing/RES4LYF.git
-https://github.com/Jonseed/ComfyUI-Detail-Daemon.git
+# ── PRIVATE / to verify — install by hand or fix the URL ────
+# comfyui-just-nodes                                             # 368 (!) — Agustin's private node: presets/prompt stack
+# comfyui-flux2klein-enhancer                                    # 81 — verify where this repo lives
+# comfyui-zit-lora-loader                                        # 42 — verify where this repo lives
 
-# ── image work ──────────────────────────────────────────────
-https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
-https://github.com/1038lab/ComfyUI-RMBG.git
-https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git
-https://github.com/chflame163/ComfyUI_LayerStyle_Advance.git
-
-# ── captioning / vision ─────────────────────────────────────
-https://github.com/kijai/ComfyUI-Florence2.git
-https://github.com/1038lab/ComfyUI-QwenVL.git
-
-# ── candidates — uncomment when needed ──────────────────────
-# https://github.com/WASasquatch/was-node-suite-comfyui.git   # heavy; needs numpy==2.3.0 fix
-# https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git
-# https://github.com/TinyTerra/ComfyUI_tinyterraNodes.git
-# https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git
-# https://github.com/cubiq/ComfyUI_FaceAnalysis.git           # needs insightface (slow build)
-# https://github.com/Fannovel16/comfyui_controlnet_aux.git
-# https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git
+# ── occasional — uncomment when a workflow needs them ───────
+# https://github.com/Fannovel16/comfyui_controlnet_aux.git       # 32
+# https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git      # 23 (video upscale)
+# https://github.com/cubiq/ComfyUI_IPAdapter_plus.git            # 19
+# https://github.com/kijai/ComfyUI-KJNodes.git                   # 68 pero casi todo viejo
+# https://github.com/kijai/ComfyUI-Florence2.git                 # 4 — QwenVL lo reemplazó
+# https://github.com/city96/ComfyUI-GGUF.git                     # 0 usos en 2026
+# https://github.com/chrisgoringe/cg-use-everywhere.git          # 6
+# https://github.com/alexopus/ComfyUI-Image-Saver.git            # 7
