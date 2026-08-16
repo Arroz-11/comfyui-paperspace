@@ -483,6 +483,118 @@ def hf_ui():
                     files, dest_ui, dl_btn, bar, status, out]))
 
 
+def _hf_fetch(repo, file, folder, token=None):
+    """Download one HF file flat into ComfyUI/models/<folder> via hardlink."""
+    from huggingface_hub import hf_hub_download
+    dest = MODELS / folder
+    dest.mkdir(parents=True, exist_ok=True)
+    target = dest / pathlib.Path(file).name
+    if target.exists():
+        return target, False
+    cached = hf_hub_download(repo, file, token=token)
+    real = os.path.realpath(cached)
+    try:
+        os.link(real, target)
+    except OSError:
+        shutil.copy2(real, target)
+        try:
+            os.remove(real)
+            if os.path.islink(cached):
+                os.remove(cached)
+        except OSError:
+            pass
+    return target, True
+
+
+# ── Model presets ───────────────────────────────────────────────
+def _presets():
+    try:
+        data = json.loads((ROOT / "config" / "presets.json").read_text())
+        return {k: v for k, v in data.items() if not k.startswith("_")}
+    except Exception as e:
+        print(f"⚠ can't read config/presets.json: {e}")
+        return {}
+
+
+def presets_ui():
+    import ipywidgets as W
+    from IPython.display import display
+
+    presets = _presets()
+    if not presets:
+        return
+    out = W.Output()
+    model_dd = W.Dropdown(
+        options=[(v["name"], k) for k, v in presets.items()],
+        description="Model:", style={"description_width": "70px"},
+        layout=W.Layout(width="320px"))
+    var_tg = W.ToggleButtons(options=["bf16", "fp8"], value="bf16",
+                             layout=W.Layout(width="220px"))
+    table = W.HTML()
+    dl_btn = W.Button(description="⬇️ Download missing", button_style="success",
+                      layout=W.Layout(width="180px", height="34px"))
+    bar = W.FloatProgress(min=0, max=100,
+                          layout=W.Layout(width="700px", visibility="hidden"))
+    lbl = W.HTML()
+
+    def _files():
+        return presets[model_dd.value]["variants"][var_tg.value]
+
+    def _render(_=None):
+        rows, missing = [], 0.0
+        for f in _files():
+            have = (MODELS / f["folder"] / pathlib.Path(f["file"]).name).exists()
+            if not have:
+                missing += f["gb"]
+            rows.append(
+                f"<tr><td>{'✅' if have else '⬜'}</td>"
+                f"<td style='padding:0 10px'>{pathlib.Path(f['file']).name}</td>"
+                f"<td>{f['folder']}</td>"
+                f"<td style='text-align:right;padding-left:10px'>{f['gb']:.2f} GB</td></tr>")
+        about = presets[model_dd.value].get("about", "")
+        table.value = (f"<i>{about}</i><table style='font-family:monospace'>"
+                       + "".join(rows) + "</table>"
+                       + (f"<b>to download: {missing:.1f} GB</b>" if missing
+                          else "<b>✅ complete — nothing to download</b>"))
+        dl_btn.disabled = missing == 0
+
+    def _download(_):
+        out.clear_output(wait=True)
+        with out:
+            token = _keys().get("huggingface") or None
+            todo = [f for f in _files()
+                    if not (MODELS / f["folder"] / pathlib.Path(f["file"]).name).exists()]
+            # pre-check de acceso por repo (los gated avisan ANTES de bajar 10 GB)
+            for repo in sorted({f["repo"] for f in todo}):
+                code, msg = hf_check(repo, token)
+                if code != "ok":
+                    print(msg)
+                    if code == "gated":
+                        return
+            bar.layout.visibility = "visible"
+            for i, f in enumerate(todo, 1):
+                name = pathlib.Path(f["file"]).name
+                bar.value = (i - 1) / len(todo) * 100
+                lbl.value = f"[{i}/{len(todo)}] {name} ({f['gb']:.2f} GB)…"
+                print(f"⬇️ [{i}/{len(todo)}] {name}")
+                try:
+                    target, downloaded = _hf_fetch(f["repo"], f["file"], f["folder"], token)
+                    print(f"   {'✅ downloaded' if downloaded else '✓ already there'}: {target}")
+                except Exception as e:
+                    print(f"   ❌ {e}")
+            bar.value = 100
+            bar.layout.visibility = "hidden"
+            lbl.value = "✅ done"
+            _render()
+
+    model_dd.observe(_render, names="value")
+    var_tg.observe(_render, names="value")
+    dl_btn.on_click(_download)
+    _render()
+    display(W.VBox([W.HTML("<h3>📦 Model Presets</h3>"),
+                    W.HBox([model_dd, var_tg]), table, dl_btn, bar, lbl, out]))
+
+
 # ── Cleaner ─────────────────────────────────────────────────────
 def _dir_size(path):
     total = 0

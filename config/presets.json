@@ -1,0 +1,51 @@
+{
+  "_comment": "Model presets for Hub.ipynb — every entry verified against the HF API (2026-08-16: file exists + real size). Edit this file to add presets; folder = subfolder of ComfyUI/models.",
+  "z-image-turbo": {
+    "name": "Z Image Turbo",
+    "about": "SFW generation, 6B",
+    "variants": {
+      "bf16": [
+        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors", "folder": "diffusion_models", "gb": 12.31},
+        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "folder": "text_encoders", "gb": 8.04},
+        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/vae/ae.safetensors", "folder": "vae", "gb": 0.34}
+      ],
+      "fp8": [
+        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors", "folder": "diffusion_models", "gb": 4.51},
+        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors", "folder": "text_encoders", "gb": 5.63},
+        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/vae/ae.safetensors", "folder": "vae", "gb": 0.34}
+      ]
+    }
+  },
+  "flux2-klein-9b": {
+    "name": "FLUX.2 Klein 9B",
+    "about": "Editing / multi-ref (gated: accept the license on HF)",
+    "variants": {
+      "bf16": [
+        {"repo": "black-forest-labs/FLUX.2-klein-9B", "file": "flux-2-klein-9b.safetensors", "folder": "diffusion_models", "gb": 18.16},
+        {"repo": "Comfy-Org/flux2-klein-9B", "file": "split_files/text_encoders/qwen_3_8b.safetensors", "folder": "text_encoders", "gb": 16.38},
+        {"repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "folder": "vae", "gb": 0.34}
+      ],
+      "fp8": [
+        {"repo": "black-forest-labs/FLUX.2-klein-9b-fp8", "file": "flux-2-klein-9b-fp8.safetensors", "folder": "diffusion_models", "gb": 9.43},
+        {"repo": "Comfy-Org/flux2-klein-9B", "file": "split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors", "folder": "text_encoders", "gb": 8.66},
+        {"repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "folder": "vae", "gb": 0.34}
+      ]
+    }
+  },
+  "flux2-klein-4b": {
+    "name": "FLUX.2 Klein 4B",
+    "about": "Lighter Klein for small storage",
+    "variants": {
+      "bf16": [
+        {"repo": "black-forest-labs/FLUX.2-klein-4B", "file": "flux-2-klein-4b.safetensors", "folder": "diffusion_models", "gb": 7.75},
+        {"repo": "Comfy-Org/flux2-klein-4B", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "folder": "text_encoders", "gb": 8.04},
+        {"repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "folder": "vae", "gb": 0.34}
+      ],
+      "fp8": [
+        {"repo": "black-forest-labs/FLUX.2-klein-4b-fp8", "file": "flux-2-klein-4b-fp8.safetensors", "folder": "diffusion_models", "gb": 4.07},
+        {"repo": "Comfy-Org/flux2-klein-4B", "file": "split_files/text_encoders/qwen_3_4b_fp4_flux2.safetensors", "folder": "text_encoders", "gb": 3.85},
+        {"repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "folder": "vae", "gb": 0.34}
+      ]
+    }
+  }
+}
