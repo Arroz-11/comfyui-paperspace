@@ -22,7 +22,13 @@ fi
 
 echo "updating $(git log -1 --format=%h) -> $(git log -1 --format=%h origin/main):"
 git log --oneline HEAD..origin/main | sed 's/^/   /'
+CHANGED=$(git diff --name-only HEAD origin/main)
 git reset --hard origin/main -q
 
 echo
-echo "✓ updated — to apply everything (new nodes, settings): bash /notebooks/scripts/start.sh"
+echo "✓ updated"
+if echo "$CHANGED" | grep -q '\.ipynb$'; then
+    echo "⚠ a notebook changed — reload its tab: File → Reload Notebook from Disk"
+    echo "  (don't save the old tab over it)"
+fi
+echo "to apply everything (new nodes, settings): bash /notebooks/scripts/start.sh"
