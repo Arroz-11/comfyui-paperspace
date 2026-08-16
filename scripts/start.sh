@@ -112,6 +112,24 @@ if [ -f "$ROOT/config/nodes.txt" ]; then
             [ -f "$dir/requirements.txt" ] && pip install -q -r "$dir/requirements.txt" || true
         fi
     done < "$ROOT/config/nodes.txt"
+
+    # WAS Node Suite wants ffmpeg's path spelled out in its config, or it warns
+    # on every boot. Create/patch the key (WAS fills in the rest of its defaults).
+    WAS_DIR="$COMFY/custom_nodes/was-node-suite-comfyui"
+    if [ -d "$WAS_DIR" ] && command -v ffmpeg >/dev/null; then
+        python - "$WAS_DIR/was_suite_config.json" "$(command -v ffmpeg)" <<'PY'
+import json, sys
+path, ffmpeg = sys.argv[1], sys.argv[2]
+try:
+    cfg = json.load(open(path))
+except (FileNotFoundError, ValueError):
+    cfg = {}
+if cfg.get("ffmpeg_bin_path") != ffmpeg:
+    cfg["ffmpeg_bin_path"] = ffmpeg
+    json.dump(cfg, open(path, "w"), indent=4)
+    print(f"  was-ns: ffmpeg_bin_path -> {ffmpeg}")
+PY
+    fi
     deactivate
 fi
 

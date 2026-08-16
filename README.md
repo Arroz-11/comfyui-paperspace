@@ -67,7 +67,7 @@ persistent storage — it is git-ignored and never leaves it.
 | `You need pytorch with cu130 or higher…` | runs fine on cu128 |
 | rgthree's "Node 2.0 rendering" essay | the author's opinion, not an error |
 | `timm.models.layers is deprecated` | upstream deprecation warning |
-| WAS `ffmpeg_bin_path is not set` | falls back to system ffmpeg (start.sh installs it) |
+| WAS `ffmpeg_bin_path is not set` | fixed automatically by start.sh (patches WAS's config with the ffmpeg path); if you ever see it, restart the machine or run start.sh once |
 | `pynvml package is deprecated` | cosmetic |
 
 If a node shows `IMPORT FAILED` with a *matplotlib backend* error, you launched
