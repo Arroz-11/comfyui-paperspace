@@ -1,0 +1,29 @@
+{
+    "Comfy.InstalledVersion": "1.49.6",
+    "Comfy.TutorialCompleted": true,
+    "Comfy.WorkflowActions.SeenItems": [
+        "enter-builder-mode"
+    ],
+    "Comfy.RightSidePanel.IsOpen": false,
+    "Comfy.DevMode": true,
+    "Comfy.Execution.PreviewMethod": "default",
+    "Comfy.Locale": "en",
+    "Comfy.NodeSearchBoxImpl.ShowNodeFrequency": true,
+    "Comfy.NodeSearchBoxImpl.ShowIdName": true,
+    "Comfy.Queue.QPOV2": true,
+    "Comfy.Workflow.WorkflowTabsPosition": "Sidebar",
+    "Comfy.Workflow.NamedValuesRestore": true,
+    "Comfy.Workflow.SortNodeIdOnSave": true,
+    "pysssss.SnapToGrid": true,
+    "Comfy.Graph.CanvasInfo": false,
+    "Comfy.LinkRenderMode": 2,
+    "Comfy.Graph.LinkMarkers": 2,
+    "LiteGraph.Node.DefaultPadding": true,
+    "Comfy.NodeBadge.NodeLifeCycleBadgeMode": "None",
+    "Comfy.NodeBadge.NodeSourceBadgeMode": "None",
+    "Comfy.Node.AlwaysShowAdvancedWidgets": true,
+    "Comfy.ColorPalette": "dark",
+    "Comfy.Sidebar.Style": "floating",
+    "Comfy.Sidebar.Size": "small",
+    "Comfy.Minimap.Visible": false
+}

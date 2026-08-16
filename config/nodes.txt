@@ -1,0 +1,37 @@
+# Custom nodes — one git URL per line. start.sh clones the missing ones on
+# every boot (and installs each node's requirements.txt if it has one).
+# Lines starting with # are ignored. Delete a line = it stops installing on
+# new machines (existing installs keep it until you remove the folder).
+
+# ── essentials ──────────────────────────────────────────────
+https://github.com/Comfy-Org/ComfyUI-Manager.git
+https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
+https://github.com/rgthree/rgthree-comfy.git
+https://github.com/cubiq/ComfyUI_essentials.git
+https://github.com/kijai/ComfyUI-KJNodes.git
+https://github.com/yolain/ComfyUI-Easy-Use.git
+https://github.com/crystian/ComfyUI-Crystools.git
+
+# ── generation / samplers ───────────────────────────────────
+https://github.com/city96/ComfyUI-GGUF.git
+https://github.com/ClownsharkBatwing/RES4LYF.git
+https://github.com/Jonseed/ComfyUI-Detail-Daemon.git
+
+# ── image work ──────────────────────────────────────────────
+https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+https://github.com/1038lab/ComfyUI-RMBG.git
+https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git
+https://github.com/chflame163/ComfyUI_LayerStyle_Advance.git
+
+# ── captioning / vision ─────────────────────────────────────
+https://github.com/kijai/ComfyUI-Florence2.git
+https://github.com/1038lab/ComfyUI-QwenVL.git
+
+# ── candidates — uncomment when needed ──────────────────────
+# https://github.com/WASasquatch/was-node-suite-comfyui.git   # heavy; needs numpy==2.3.0 fix
+# https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git
+# https://github.com/TinyTerra/ComfyUI_tinyterraNodes.git
+# https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git
+# https://github.com/cubiq/ComfyUI_FaceAnalysis.git           # needs insightface (slow build)
+# https://github.com/Fannovel16/comfyui_controlnet_aux.git
+# https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git

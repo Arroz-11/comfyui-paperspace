@@ -82,15 +82,34 @@ if [ ! -d "$COMFY/.git" ]; then
     echo "  installing requirements..."
     pip install -q -r "$COMFY/requirements.txt"
 
-    echo "  installing ComfyUI-Manager..."
-    git clone https://github.com/Comfy-Org/ComfyUI-Manager.git \
-        "$COMFY/custom_nodes/ComfyUI-Manager"
-    pip install -q -r "$COMFY/custom_nodes/ComfyUI-Manager/requirements.txt" || true
+    # Default UI settings (only on first install — after that they're yours)
+    mkdir -p "$COMFY/user/default"
+    cp "$ROOT/config/comfy.settings.json" "$COMFY/user/default/comfy.settings.json" 2>/dev/null || true
 
     python -c "import torch; print(f'  PyTorch {torch.__version__} | CUDA {torch.version.cuda} | GPU {torch.cuda.is_available()}')"
     deactivate
 else
     step "5/6 ComfyUI already installed"
+fi
+
+# ── 5b. Custom nodes from config/nodes.txt ────────────────────
+# Runs every boot but only clones what's missing, so it's a no-op when
+# everything is already there. Edit the list, push, recreate → done.
+if [ -f "$ROOT/config/nodes.txt" ]; then
+    step "5b/6 custom nodes"
+    # shellcheck disable=SC1091
+    source "$VENV/bin/activate"
+    while IFS= read -r url; do
+        case "$url" in ''|\#*) continue ;; esac
+        name=$(basename "$url" .git)
+        dir="$COMFY/custom_nodes/$name"
+        if [ ! -d "$dir" ]; then
+            echo "  + $name"
+            git clone -q "$url" "$dir" || { echo "    ⚠ clone failed"; continue; }
+            [ -f "$dir/requirements.txt" ] && pip install -q -r "$dir/requirements.txt" || true
+        fi
+    done < "$ROOT/config/nodes.txt"
+    deactivate
 fi
 
 # ── 6. Launch ComfyUI ─────────────────────────────────────────
