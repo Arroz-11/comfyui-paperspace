@@ -602,6 +602,58 @@ def presets_ui():
 
 
 # ── Cleaner ─────────────────────────────────────────────────────
+def _disk_html():
+    """Usage bar for /notebooks + breakdown of the heavy folders.
+    Hardlinked files (models <-> HF cache) are counted once, under the
+    first bucket that sees them — so 'HF cache' shows only its UNIQUE bytes."""
+    try:
+        usage = shutil.disk_usage(ROOT)
+    except OSError:
+        return "<i>disk info unavailable</i>"
+    seen = set()
+
+    def sz(path):
+        total = 0
+        p = pathlib.Path(path)
+        if not p.is_dir():
+            return 0
+        for f in p.rglob("*"):
+            try:
+                st = f.lstat()
+            except OSError:
+                continue
+            if not f.is_file() or f.is_symlink():
+                continue
+            key = (st.st_dev, st.st_ino)
+            if key in seen:
+                continue
+            seen.add(key)
+            total += st.st_size
+        return total
+
+    # Order matters: earlier buckets claim shared (hardlinked) bytes.
+    # 'ComfyUI (rest)' scans all of ComfyUI/ but venv+models are already seen.
+    parts = [("models", sz(MODELS)),
+             ("ComfyUI venv", sz(COMFY / "comfyenv")),
+             ("ComfyUI (rest)", sz(COMFY)),
+             ("HF cache", sz(ROOT / "huggingface_cache"))]
+    parts.append(("other", max(0, usage.used - sum(s for _, s in parts))))
+
+    pct = usage.used / usage.total * 100 if usage.total else 0
+    color = "#4caf50" if pct < 80 else "#ff9800" if pct < 90 else "#f44336"
+    rows = "".join(
+        f"<tr><td style='padding-right:14px'>{name}</td>"
+        f"<td style='text-align:right'>{_fmt(size)}</td>"
+        f"<td style='text-align:right;padding-left:14px;opacity:.7'>"
+        f"{size / usage.total * 100:.0f}%</td></tr>"
+        for name, size in parts if size)
+    return (
+        f"<b>💾 /notebooks: {_fmt(usage.used)} / {_fmt(usage.total)} ({pct:.0f}%)</b>"
+        f"<div style='width:700px;height:10px;background:#333;border-radius:5px;margin:4px 0 8px'>"
+        f"<div style='width:{min(pct, 100):.1f}%;height:100%;background:{color};border-radius:5px'></div></div>"
+        f"<table style='font-family:monospace'>{rows}</table>")
+
+
 def _dir_size(path):
     total = 0
     for p in pathlib.Path(path).rglob("*"):
@@ -677,6 +729,7 @@ def cleaner_ui():
         _gate(None)
 
     def _refresh_all(_=None):
+        disk.value = _disk_html()
         folder_dd.options = folder_options()
         _refresh_items()
 
@@ -725,7 +778,9 @@ def cleaner_ui():
         w.observe(_gate, names="value")
     run.on_click(_run)
 
-    display(W.VBox([W.HTML("<h3>🧹 Cleaner</h3>"), folder_dd, mode,
+    disk = W.HTML(_disk_html())
+    display(W.VBox([W.HTML("<h3>🧹 Cleaner</h3>"), disk, W.HTML("<hr>"),
+                    folder_dd, mode,
                     W.HBox([sel_all, refresh]), items, confirm, run, logw]))
     _refresh_items()
 
