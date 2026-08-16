@@ -277,10 +277,22 @@ def hf_ui():
                                              token=get_token() or None)
                     target = dest / pathlib.Path(fname).name
                     if not target.exists():
+                        # Hardlink: flat filename in models/ AND zero extra disk —
+                        # the cache "copy" is the same physical bytes, so clearing
+                        # the cache later never breaks the model file.
+                        real = os.path.realpath(cached)
                         try:
-                            os.link(cached, target)   # no duplicated disk
+                            os.link(real, target)
                         except OSError:
-                            shutil.copy2(cached, target)
+                            # copy fallback: now it IS duplicated, so drop the
+                            # cache blob right away
+                            shutil.copy2(real, target)
+                            try:
+                                os.remove(real)
+                                if os.path.islink(cached):
+                                    os.remove(cached)
+                            except OSError:
+                                pass
                     print(f"✅ {target.name}")
                 except Exception as e:
                     print(f"❌ {e}")
