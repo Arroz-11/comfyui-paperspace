@@ -35,7 +35,11 @@ ComfyUI in the cloud.
 
 ## Quick start
 
-Create a Gradient notebook with **Advanced options**:
+> **Easiest way**: [Paperspace Hub](https://github.com/Arroz-11/paperspace-hub)
+> — a local control panel with a built-in template for this repo. Add your API
+> key, pick the ComfyUI template, done.
+
+Or create the Gradient notebook by hand with **Advanced options**:
 
 | Field | Value |
 |---|---|
