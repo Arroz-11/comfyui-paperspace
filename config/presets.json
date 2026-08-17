@@ -32,6 +32,22 @@
       ]
     }
   },
+  "krea-2": {
+    "name": "Krea 2",
+    "about": "Realistic text-to-image, 13B (Turbo, 8 steps)",
+    "variants": {
+      "bf16": [
+        {"repo": "Comfy-Org/Krea-2", "file": "diffusion_models/krea2_turbo_bf16.safetensors", "folder": "diffusion_models", "gb": 24.48},
+        {"repo": "Comfy-Org/Krea-2", "file": "text_encoders/qwen3vl_4b_bf16.safetensors", "folder": "text_encoders", "gb": 8.27},
+        {"repo": "Comfy-Org/Krea-2", "file": "vae/qwen_image_vae.safetensors", "folder": "vae", "gb": 0.24}
+      ],
+      "fp8": [
+        {"repo": "Comfy-Org/Krea-2", "file": "diffusion_models/krea2_turbo_fp8_scaled.safetensors", "folder": "diffusion_models", "gb": 12.24},
+        {"repo": "Comfy-Org/Krea-2", "file": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors", "folder": "text_encoders", "gb": 4.88},
+        {"repo": "Comfy-Org/Krea-2", "file": "vae/qwen_image_vae.safetensors", "folder": "vae", "gb": 0.24}
+      ]
+    }
+  },
   "flux2-klein-4b": {
     "name": "FLUX.2 Klein 4B",
     "about": "Lighter Klein for small storage",
