@@ -2,18 +2,40 @@
   "_comment": "Model presets for Hub.ipynb — every file verified against the HF API (existence + real size). Each component lists its quant options (FIRST = default); mix freely, e.g. bf16 diffusion + fp8 text encoder. folder = subfolder of ComfyUI/models; options may override it.",
   "z-image-turbo": {
     "name": "Z Image Turbo",
-    "about": "Fast text-to-image, 6B",
+    "about": "Fast text-to-image, 6B (8 steps, cfg 1)",
     "components": {
       "diffusion": {"folder": "diffusion_models", "options": [
-        {"label": "bf16", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors", "gb": 12.31},
-        {"label": "nvfp4 (Blackwell)", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors", "gb": 4.51}
+        {"label": "bf16", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors", "gb": 11.46},
+        {"label": "int8", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors", "gb": 5.78},
+        {"label": "nvfp4 (Blackwell)", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors", "gb": 4.20}
       ]},
       "text encoder": {"folder": "text_encoders", "options": [
-        {"label": "bf16", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "gb": 8.04},
-        {"label": "fp8", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors", "gb": 5.63}
+        {"label": "bf16", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "gb": 7.49},
+        {"label": "fp8", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors", "gb": 5.25},
+        {"label": "fp4", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b_fp4_mixed.safetensors", "gb": 3.24}
       ]},
       "vae": {"folder": "vae", "options": [
-        {"label": "default", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/vae/ae.safetensors", "gb": 0.34}
+        {"label": "default", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/vae/ae.safetensors", "gb": 0.31}
+      ]}
+    }
+  },
+  "z-image": {
+    "name": "Z Image (base)",
+    "about": "Undistilled base — for LoRA training and quality/diversity at 25-50 steps, cfg 3-5. Shares TE/VAE with Turbo",
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/z_image", "file": "split_files/diffusion_models/z_image_bf16.safetensors", "gb": 11.46},
+        {"label": "int8", "repo": "Comfy-Org/z_image", "file": "split_files/diffusion_models/z_image_int8_convrot.safetensors", "gb": 5.78}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "gb": 7.49},
+        {"label": "fp8", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors", "gb": 5.25}
+      ]},
+      "vae": {"folder": "vae", "options": [
+        {"label": "default", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/vae/ae.safetensors", "gb": 0.31}
+      ]},
+      "distill patch lora": {"folder": "loras", "options": [
+        {"label": "8-steps patch (for base/finetunes)", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/loras/z_image_turbo_distill_patch_lora_bf16.safetensors", "gb": 0.15}
       ]}
     }
   },
@@ -67,6 +89,52 @@
       ]},
       "vae": {"folder": "vae", "options": [
         {"label": "default", "repo": "Comfy-Org/Krea-2", "file": "vae/qwen_image_vae.safetensors", "gb": 0.24}
+      ]}
+    }
+  },
+  "qwen-image-edit": {
+    "name": "Qwen Image Edit 2511",
+    "about": "Image editing, 20B — native multi-image (up to 3 refs). Quality mode: 20-40 steps cfg 4 (Lightning LoRA ships OFF in the template)",
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI", "file": "split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors", "gb": 38.06},
+        {"label": "fp8mixed (template)", "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI", "file": "split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors", "gb": 19.12},
+        {"label": "int8 (pre-Ada GPUs)", "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI", "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors", "gb": 19.09}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "full", "repo": "Comfy-Org/Qwen-Image_ComfyUI", "file": "split_files/text_encoders/qwen_2.5_vl_7b.safetensors", "gb": 15.45},
+        {"label": "fp8_scaled (template)", "repo": "Comfy-Org/Qwen-Image_ComfyUI", "file": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors", "gb": 8.74},
+        {"label": "nvfp4 (Blackwell)", "repo": "Comfy-Org/Qwen-Image_ComfyUI", "file": "split_files/text_encoders/qwen_2.5_vl_7b_nvfp4.safetensors", "gb": 5.69}
+      ]},
+      "vae": {"folder": "vae", "options": [
+        {"label": "default", "repo": "Comfy-Org/Qwen-Image_ComfyUI", "file": "split_files/vae/qwen_image_vae.safetensors", "gb": 0.24}
+      ]},
+      "lightning lora": {"folder": "loras", "options": [
+        {"label": "4-steps (template toggle, off by default)", "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning", "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors", "gb": 0.79},
+        {"label": "8-steps (better fast mode)", "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning", "file": "Qwen-Image-Edit-2511-Lightning-8steps-V1.0-bf16.safetensors", "gb": 0.79}
+      ]}
+    }
+  },
+  "wan-animate-2": {
+    "name": "Wan-Animate-2",
+    "about": "Character animation, 14B — reference image + driving video. 832x480, 81-frame segments, 6 steps cfg 1 (lcm)",
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/Wan-Animate-2", "file": "diffusion_models/wan_animate_2_bf16.safetensors", "gb": 30.54},
+        {"label": "int8 (template)", "repo": "Comfy-Org/Wan-Animate-2", "file": "diffusion_models/wan_animate_2_int8_convrot.safetensors", "gb": 15.51}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "fp16", "repo": "Comfy-Org/Wan-Animate-2", "file": "text_encoders/umt5_xxl_fp16.safetensors", "gb": 10.59},
+        {"label": "fp8 (template)", "repo": "Comfy-Org/Wan-Animate-2", "file": "text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors", "gb": 6.27}
+      ]},
+      "clip vision": {"folder": "clip_vision", "options": [
+        {"label": "default", "repo": "Comfy-Org/Wan-Animate-2", "file": "clip_vision/clip_vision_h.safetensors", "gb": 1.18}
+      ]},
+      "vae": {"folder": "vae", "options": [
+        {"label": "Wan 2.1", "repo": "Comfy-Org/Wan-Animate-2", "file": "vae/Wan2_1_VAE_bf16.safetensors", "gb": 0.24}
+      ]},
+      "step-distill lora": {"folder": "loras", "options": [
+        {"label": "lightx2v (makes base run at 6 steps)", "repo": "Comfy-Org/Wan-Animate-2", "file": "loras/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors", "gb": 0.69}
       ]}
     }
   },
