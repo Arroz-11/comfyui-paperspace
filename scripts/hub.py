@@ -538,8 +538,11 @@ def presets_ui():
         options=[(v["name"], k) for k, v in presets.items()],
         description="Model:", style={"description_width": "70px"},
         layout=W.Layout(width="320px"))
-    var_tg = W.ToggleButtons(options=["bf16", "fp8"], value="bf16",
-                             layout=W.Layout(width="220px"))
+    # Variants come from the preset itself (bf16/fp8, bf16/int8, ...) — the
+    # toggle follows whatever the JSON defines, no hardcoded pair.
+    first = next(iter(presets.values()))
+    var_tg = W.ToggleButtons(options=list(first["variants"]),
+                             layout=W.Layout(width="260px"))
     table = W.HTML()
     dl_btn = W.Button(description="⬇️ Download missing", button_style="success",
                       layout=W.Layout(width="180px", height="34px"))
@@ -604,7 +607,14 @@ def presets_ui():
             lbl.value = "✅ done"
             _render()
 
-    model_dd.observe(_render, names="value")
+    def _sync_variants(_=None):
+        opts = list(presets[model_dd.value]["variants"])
+        if list(var_tg.options) != opts:
+            var_tg.options = opts   # resets value -> fires _render via observer
+        else:
+            _render()
+
+    model_dd.observe(_sync_variants, names="value")
     var_tg.observe(_render, names="value")
     dl_btn.on_click(_download)
     _render()

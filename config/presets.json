@@ -32,6 +32,28 @@
       ]
     }
   },
+  "ltx-2.5": {
+    "name": "LTX-2.5",
+    "about": "Video + audio, 22B (distilled, 8 steps). Gated: accept the license on HF. No fp8 exists — int8 is the official quant",
+    "variants": {
+      "bf16": [
+        {"repo": "Lightricks/LTX-2.5", "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-bf16.safetensors", "folder": "diffusion_models", "gb": 39.13},
+        {"repo": "Lightricks/LTX-2.5", "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-bf16.safetensors", "folder": "text_encoders", "gb": 24.46},
+        {"repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-video-vae-bf16.safetensors", "folder": "vae", "gb": 1.37},
+        {"repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-audio-vae-bf16.safetensors", "folder": "vae", "gb": 0.34},
+        {"repo": "Lightricks/LTX-2.5", "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors", "folder": "latent_upscale_models", "gb": 0.93},
+        {"repo": "Comfy-Org/gemma-4", "file": "text_encoders/gemma4_e2b_it_bf16.safetensors", "folder": "text_encoders", "gb": 9.57}
+      ],
+      "int8": [
+        {"repo": "Lightricks/LTX-2.5", "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors", "folder": "diffusion_models", "gb": 20.03},
+        {"repo": "Lightricks/LTX-2.5", "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors", "folder": "text_encoders", "gb": 14.32},
+        {"repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-video-vae-bf16.safetensors", "folder": "vae", "gb": 1.37},
+        {"repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-audio-vae-bf16.safetensors", "folder": "vae", "gb": 0.34},
+        {"repo": "Lightricks/LTX-2.5", "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors", "folder": "latent_upscale_models", "gb": 0.93},
+        {"repo": "Comfy-Org/gemma-4", "file": "text_encoders/gemma4_e2b_it_bf16.safetensors", "folder": "text_encoders", "gb": 9.57}
+      ]
+    }
+  },
   "krea-2": {
     "name": "Krea 2",
     "about": "Realistic text-to-image, 13B (Turbo, 8 steps)",
