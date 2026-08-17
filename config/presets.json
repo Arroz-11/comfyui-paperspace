@@ -1,89 +1,100 @@
 {
-  "_comment": "Model presets for Hub.ipynb — every entry verified against the HF API (2026-08-16: file exists + real size). Edit this file to add presets; folder = subfolder of ComfyUI/models.",
+  "_comment": "Model presets for Hub.ipynb — every file verified against the HF API (existence + real size). Each component lists its quant options (FIRST = default); mix freely, e.g. bf16 diffusion + fp8 text encoder. folder = subfolder of ComfyUI/models; options may override it.",
   "z-image-turbo": {
     "name": "Z Image Turbo",
     "about": "Fast text-to-image, 6B",
-    "variants": {
-      "bf16": [
-        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors", "folder": "diffusion_models", "gb": 12.31},
-        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "folder": "text_encoders", "gb": 8.04},
-        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/vae/ae.safetensors", "folder": "vae", "gb": 0.34}
-      ],
-      "fp8": [
-        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors", "folder": "diffusion_models", "gb": 4.51},
-        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors", "folder": "text_encoders", "gb": 5.63},
-        {"repo": "Comfy-Org/z_image_turbo", "file": "split_files/vae/ae.safetensors", "folder": "vae", "gb": 0.34}
-      ]
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors", "gb": 12.31},
+        {"label": "nvfp4 (Blackwell)", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors", "gb": 4.51}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "gb": 8.04},
+        {"label": "fp8", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors", "gb": 5.63}
+      ]},
+      "vae": {"folder": "vae", "options": [
+        {"label": "default", "repo": "Comfy-Org/z_image_turbo", "file": "split_files/vae/ae.safetensors", "gb": 0.34}
+      ]}
     }
   },
   "flux2-klein-9b": {
     "name": "FLUX.2 Klein 9B",
     "about": "Editing / multi-ref (gated: accept the license on HF)",
-    "variants": {
-      "bf16": [
-        {"repo": "black-forest-labs/FLUX.2-klein-9B", "file": "flux-2-klein-9b.safetensors", "folder": "diffusion_models", "gb": 18.16},
-        {"repo": "Comfy-Org/flux2-klein-9B", "file": "split_files/text_encoders/qwen_3_8b.safetensors", "folder": "text_encoders", "gb": 16.38},
-        {"repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "folder": "vae", "gb": 0.34}
-      ],
-      "fp8": [
-        {"repo": "black-forest-labs/FLUX.2-klein-9b-fp8", "file": "flux-2-klein-9b-fp8.safetensors", "folder": "diffusion_models", "gb": 9.43},
-        {"repo": "Comfy-Org/flux2-klein-9B", "file": "split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors", "folder": "text_encoders", "gb": 8.66},
-        {"repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "folder": "vae", "gb": 0.34}
-      ]
-    }
-  },
-  "ltx-2.5": {
-    "name": "LTX-2.5",
-    "about": "Video + audio, 22B (distilled, 8 steps). Gated: accept the license on HF. No fp8 exists — int8 is the official quant",
-    "variants": {
-      "bf16": [
-        {"repo": "Lightricks/LTX-2.5", "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-bf16.safetensors", "folder": "diffusion_models", "gb": 39.13},
-        {"repo": "Lightricks/LTX-2.5", "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-bf16.safetensors", "folder": "text_encoders", "gb": 24.46},
-        {"repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-video-vae-bf16.safetensors", "folder": "vae", "gb": 1.37},
-        {"repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-audio-vae-bf16.safetensors", "folder": "vae", "gb": 0.34},
-        {"repo": "Lightricks/LTX-2.5", "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors", "folder": "latent_upscale_models", "gb": 0.93},
-        {"repo": "Comfy-Org/gemma-4", "file": "text_encoders/gemma4_e2b_it_bf16.safetensors", "folder": "text_encoders", "gb": 9.57}
-      ],
-      "int8": [
-        {"repo": "Lightricks/LTX-2.5", "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors", "folder": "diffusion_models", "gb": 20.03},
-        {"repo": "Lightricks/LTX-2.5", "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors", "folder": "text_encoders", "gb": 14.32},
-        {"repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-video-vae-bf16.safetensors", "folder": "vae", "gb": 1.37},
-        {"repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-audio-vae-bf16.safetensors", "folder": "vae", "gb": 0.34},
-        {"repo": "Lightricks/LTX-2.5", "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors", "folder": "latent_upscale_models", "gb": 0.93},
-        {"repo": "Comfy-Org/gemma-4", "file": "text_encoders/gemma4_e2b_it_bf16.safetensors", "folder": "text_encoders", "gb": 9.57}
-      ]
-    }
-  },
-  "krea-2": {
-    "name": "Krea 2",
-    "about": "Realistic text-to-image, 13B (Turbo, 8 steps)",
-    "variants": {
-      "bf16": [
-        {"repo": "Comfy-Org/Krea-2", "file": "diffusion_models/krea2_turbo_bf16.safetensors", "folder": "diffusion_models", "gb": 24.48},
-        {"repo": "Comfy-Org/Krea-2", "file": "text_encoders/qwen3vl_4b_bf16.safetensors", "folder": "text_encoders", "gb": 8.27},
-        {"repo": "Comfy-Org/Krea-2", "file": "vae/qwen_image_vae.safetensors", "folder": "vae", "gb": 0.24}
-      ],
-      "fp8": [
-        {"repo": "Comfy-Org/Krea-2", "file": "diffusion_models/krea2_turbo_fp8_scaled.safetensors", "folder": "diffusion_models", "gb": 12.24},
-        {"repo": "Comfy-Org/Krea-2", "file": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors", "folder": "text_encoders", "gb": 4.88},
-        {"repo": "Comfy-Org/Krea-2", "file": "vae/qwen_image_vae.safetensors", "folder": "vae", "gb": 0.24}
-      ]
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16", "repo": "black-forest-labs/FLUX.2-klein-9B", "file": "flux-2-klein-9b.safetensors", "gb": 18.16},
+        {"label": "fp8", "repo": "black-forest-labs/FLUX.2-klein-9b-fp8", "file": "flux-2-klein-9b-fp8.safetensors", "gb": 9.43}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/flux2-klein-9B", "file": "split_files/text_encoders/qwen_3_8b.safetensors", "gb": 16.38},
+        {"label": "fp8", "repo": "Comfy-Org/flux2-klein-9B", "file": "split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors", "gb": 8.66}
+      ]},
+      "vae": {"folder": "vae", "options": [
+        {"label": "default", "repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "gb": 0.34}
+      ]}
     }
   },
   "flux2-klein-4b": {
     "name": "FLUX.2 Klein 4B",
     "about": "Lighter Klein for small storage",
-    "variants": {
-      "bf16": [
-        {"repo": "black-forest-labs/FLUX.2-klein-4B", "file": "flux-2-klein-4b.safetensors", "folder": "diffusion_models", "gb": 7.75},
-        {"repo": "Comfy-Org/flux2-klein-4B", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "folder": "text_encoders", "gb": 8.04},
-        {"repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "folder": "vae", "gb": 0.34}
-      ],
-      "fp8": [
-        {"repo": "black-forest-labs/FLUX.2-klein-4b-fp8", "file": "flux-2-klein-4b-fp8.safetensors", "folder": "diffusion_models", "gb": 4.07},
-        {"repo": "Comfy-Org/flux2-klein-4B", "file": "split_files/text_encoders/qwen_3_4b_fp4_flux2.safetensors", "folder": "text_encoders", "gb": 3.85},
-        {"repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "folder": "vae", "gb": 0.34}
-      ]
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16", "repo": "black-forest-labs/FLUX.2-klein-4B", "file": "flux-2-klein-4b.safetensors", "gb": 7.75},
+        {"label": "fp8", "repo": "black-forest-labs/FLUX.2-klein-4b-fp8", "file": "flux-2-klein-4b-fp8.safetensors", "gb": 4.07}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/flux2-klein-4B", "file": "split_files/text_encoders/qwen_3_4b.safetensors", "gb": 8.04},
+        {"label": "fp4", "repo": "Comfy-Org/flux2-klein-4B", "file": "split_files/text_encoders/qwen_3_4b_fp4_flux2.safetensors", "gb": 3.85}
+      ]},
+      "vae": {"folder": "vae", "options": [
+        {"label": "default", "repo": "Comfy-Org/flux2-dev", "file": "split_files/vae/flux2-vae.safetensors", "gb": 0.34}
+      ]}
+    }
+  },
+  "krea-2": {
+    "name": "Krea 2",
+    "about": "Realistic text-to-image, 13B (Turbo, 8 steps)",
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/Krea-2", "file": "diffusion_models/krea2_turbo_bf16.safetensors", "gb": 24.48},
+        {"label": "fp8", "repo": "Comfy-Org/Krea-2", "file": "diffusion_models/krea2_turbo_fp8_scaled.safetensors", "gb": 12.24},
+        {"label": "int8", "repo": "Comfy-Org/Krea-2", "file": "diffusion_models/krea2_turbo_int8_convrot.safetensors", "gb": 12.57},
+        {"label": "nvfp4 (Blackwell)", "repo": "Comfy-Org/Krea-2", "file": "diffusion_models/krea2_turbo_nvfp4.safetensors", "gb": 7.15}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/Krea-2", "file": "text_encoders/qwen3vl_4b_bf16.safetensors", "gb": 8.27},
+        {"label": "fp8", "repo": "Comfy-Org/Krea-2", "file": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors", "gb": 4.88}
+      ]},
+      "vae": {"folder": "vae", "options": [
+        {"label": "default", "repo": "Comfy-Org/Krea-2", "file": "vae/qwen_image_vae.safetensors", "gb": 0.24}
+      ]}
+    }
+  },
+  "ltx-2.5": {
+    "name": "LTX-2.5",
+    "about": "Video + audio, 22B (distilled, 8 steps). Gated: accept the license on HF. int8 = the official ComfyUI quant (no fp8 exists)",
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16", "repo": "Lightricks/LTX-2.5", "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-bf16.safetensors", "gb": 39.13},
+        {"label": "int8 (template)", "repo": "Lightricks/LTX-2.5", "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors", "gb": 20.03},
+        {"label": "nvfp4 (Blackwell)", "repo": "Lightricks/LTX-2.5", "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-nvfp4.safetensors", "gb": 17.44}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "bf16", "repo": "Lightricks/LTX-2.5", "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-bf16.safetensors", "gb": 24.46},
+        {"label": "int8 (template)", "repo": "Lightricks/LTX-2.5", "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors", "gb": 14.32}
+      ]},
+      "vae video": {"folder": "vae", "options": [
+        {"label": "default", "repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-video-vae-bf16.safetensors", "gb": 1.37}
+      ]},
+      "vae audio": {"folder": "vae", "options": [
+        {"label": "default", "repo": "Lightricks/LTX-2.5", "file": "vae/ltx-2.5-audio-vae-bf16.safetensors", "gb": 0.34}
+      ]},
+      "spatial upscaler": {"folder": "latent_upscale_models", "options": [
+        {"label": "default", "repo": "Lightricks/LTX-2.5", "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors", "gb": 0.93}
+      ]},
+      "prompt enhancer": {"folder": "text_encoders", "options": [
+        {"label": "gemma4 e2b", "repo": "Comfy-Org/gemma-4", "file": "text_encoders/gemma4_e2b_it_bf16.safetensors", "gb": 9.57}
+      ]}
     }
   }
 }

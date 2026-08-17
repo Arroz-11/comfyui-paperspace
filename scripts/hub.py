@@ -527,6 +527,10 @@ def _presets():
 
 
 def presets_ui():
+    """Per-component quant picker: each component (diffusion, text encoder…)
+    has its own dropdown of quant options, so you can mix e.g. bf16 diffusion
+    with fp8 text encoder. Single-option components (vae…) show as fixed rows.
+    First option in the JSON = default."""
     import ipywidgets as W
     from IPython.display import display
 
@@ -538,88 +542,115 @@ def presets_ui():
         options=[(v["name"], k) for k, v in presets.items()],
         description="Model:", style={"description_width": "70px"},
         layout=W.Layout(width="320px"))
-    # Variants come from the preset itself (bf16/fp8, bf16/int8, ...) — the
-    # toggle follows whatever the JSON defines, no hardcoded pair.
-    first = next(iter(presets.values()))
-    var_tg = W.ToggleButtons(options=list(first["variants"]),
-                             layout=W.Layout(width="260px"))
+    comp_box = W.VBox()
     table = W.HTML()
     dl_btn = W.Button(description="⬇️ Download missing", button_style="success",
                       layout=W.Layout(width="180px", height="34px"))
     bar = W.FloatProgress(min=0, max=100,
                           layout=W.Layout(width="700px", visibility="hidden"))
     lbl = W.HTML()
+    dds = {}   # component name -> Dropdown (multi-option components only)
 
-    def _files():
-        return presets[model_dd.value]["variants"][var_tg.value]
+    def _comps():
+        return presets[model_dd.value]["components"]
+
+    def _target(comp, opt):
+        folder = opt.get("folder", comp.get("folder"))
+        return MODELS / folder / pathlib.Path(opt["file"]).name, folder
+
+    def _selection():
+        """[(component name, comp, chosen option)] — dropdown pick or only option."""
+        sel = []
+        for name, comp in _comps().items():
+            i = dds[name].value if name in dds else 0
+            sel.append((name, comp, comp["options"][i]))
+        return sel
 
     def _render(_=None):
-        rows, missing = [], 0.0
-        for f in _files():
-            have = (MODELS / f["folder"] / pathlib.Path(f["file"]).name).exists()
+        rows, total, missing = [], 0.0, 0.0
+        for name, comp, opt in _selection():
+            path, folder = _target(comp, opt)
+            have = path.exists()
+            total += opt["gb"]
             if not have:
-                missing += f["gb"]
+                missing += opt["gb"]
             rows.append(
                 f"<tr><td>{'✅' if have else '⬜'}</td>"
-                f"<td style='padding:0 10px'>{pathlib.Path(f['file']).name}</td>"
-                f"<td>{f['folder']}</td>"
-                f"<td style='text-align:right;padding-left:10px'>{f['gb']:.2f} GB</td></tr>")
+                f"<td style='padding:0 10px'>{name}</td>"
+                f"<td>{pathlib.Path(opt['file']).name}</td>"
+                f"<td style='padding-left:10px;opacity:.6'>{folder}</td>"
+                f"<td style='text-align:right;padding-left:10px'>{opt['gb']:.2f} GB</td></tr>")
         about = presets[model_dd.value].get("about", "")
         table.value = (f"<i>{about}</i><table style='font-family:monospace'>"
                        + "".join(rows) + "</table>"
-                       + (f"<b>to download: {missing:.1f} GB</b>" if missing
-                          else "<b>✅ complete — nothing to download</b>"))
+                       + f"<b>selected: {total:.1f} GB"
+                       + (f" · to download: {missing:.1f} GB</b>" if missing
+                          else " · ✅ complete — nothing to download</b>"))
         dl_btn.disabled = missing == 0
+
+    def _build(_=None):
+        dds.clear()
+        widgets = []
+        for name, comp in _comps().items():
+            opts = comp["options"]
+            if len(opts) < 2:
+                continue   # fixed component -> table row only
+            def _label(o, comp=comp):
+                have = (MODELS / o.get("folder", comp.get("folder"))
+                        / pathlib.Path(o["file"]).name).exists()
+                return f"{o['label']} — {o['gb']:.2f} GB" + (" ✓" if have else "")
+            dd = W.Dropdown(options=[(_label(o), i) for i, o in enumerate(opts)],
+                            value=0, description=name,
+                            style={"description_width": "110px"},
+                            layout=W.Layout(width="460px"))
+            dd.observe(_render, names="value")
+            dds[name] = dd
+            widgets.append(dd)
+        comp_box.children = widgets
+        _render()
 
     def _download(_):
         out.clear_output(wait=True)
         with out:
             token = _keys().get("huggingface") or None
-            todo = [f for f in _files()
-                    if not (MODELS / f["folder"] / pathlib.Path(f["file"]).name).exists()]
+            todo = [(name, comp, opt) for name, comp, opt in _selection()
+                    if not _target(comp, opt)[0].exists()]
             # pre-check de acceso por repo (los gated avisan ANTES de bajar 10 GB)
-            for repo in sorted({f["repo"] for f in todo}):
+            for repo in sorted({opt["repo"] for _, _, opt in todo}):
                 code, msg = hf_check(repo, token)
                 if code != "ok":
                     print(msg)
                     if code == "gated":
                         return
             bar.layout.visibility = "visible"
-            for i, f in enumerate(todo, 1):
-                name = pathlib.Path(f["file"]).name
+            for i, (name, comp, opt) in enumerate(todo, 1):
+                fname = pathlib.Path(opt["file"]).name
+                folder = opt.get("folder", comp.get("folder"))
                 bar.value = (i - 1) / len(todo) * 100
 
-                def _prog(done, total, dt, i=i, name=name):
+                def _prog(done, total, dt, i=i, fname=fname):
                     if total:
                         bar.value = ((i - 1) + done / total) / len(todo) * 100
                     speed = done / dt / 1e6 if dt > 0.5 else 0
-                    lbl.value = (f"⬇️ [{i}/{len(todo)}] {name} — "
+                    lbl.value = (f"⬇️ [{i}/{len(todo)}] {fname} — "
                                  f"{_fmt(done)} / {_fmt(total)}"
                                  + (f"  ({speed:.0f} MB/s)" if speed else ""))
 
                 try:
-                    _hf_stream(f["repo"], f["file"], f["folder"], token, _prog)
-                    print(f"✅ {name} → {f['folder']}")
+                    _hf_stream(opt["repo"], opt["file"], folder, token, _prog)
+                    print(f"✅ {fname} → {folder}")
                 except Exception as e:
-                    print(f"❌ {name}: {e}")
+                    print(f"❌ {fname}: {e}")
             bar.value = 100
             bar.layout.visibility = "hidden"
             lbl.value = "✅ done"
-            _render()
+            _build()   # refresh ✓ marks in the dropdowns too
 
-    def _sync_variants(_=None):
-        opts = list(presets[model_dd.value]["variants"])
-        if list(var_tg.options) != opts:
-            var_tg.options = opts   # resets value -> fires _render via observer
-        else:
-            _render()
-
-    model_dd.observe(_sync_variants, names="value")
-    var_tg.observe(_render, names="value")
+    model_dd.observe(_build, names="value")
     dl_btn.on_click(_download)
-    _render()
-    display(W.VBox([W.HTML("<h3>📦 Model Presets</h3>"),
-                    W.HBox([model_dd, var_tg]), table, dl_btn, bar, lbl, out]))
+    _build()
+    display(W.VBox([W.HTML("<h3>📦 Model Presets</h3>"), model_dd, comp_box,
+                    table, dl_btn, bar, lbl, out]))
 
 
 # ── Cleaner ─────────────────────────────────────────────────────
