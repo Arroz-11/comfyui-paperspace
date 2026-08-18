@@ -33,6 +33,11 @@ https://github.com/capitan01R/Comfyui-ZiT-Lora-loader.git        # 42 (LoRAs de 
 https://github.com/Jonseed/ComfyUI-Detail-Daemon.git             # 28
 https://github.com/badjeff/comfyui_lora_tag_loader.git           # 23
 
+# ── video (added ago-2026 for MiniMax H3 / LTX / Wan workflows) ──
+https://github.com/kijai/ComfyUI-KJNodes.git                     # Sage Attention patch + utils (promoted: video era)
+https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git      # load/combine video — the community standard
+https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git    # RIFE/FILM 24->48fps post-gen
+
 # ── monitoring (no workflow nodes, just useful) ─────────────
 https://github.com/crystian/ComfyUI-Crystools.git
 
@@ -40,7 +45,7 @@ https://github.com/crystian/ComfyUI-Crystools.git
 # https://github.com/Fannovel16/comfyui_controlnet_aux.git       # 32
 # https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git      # 23 (video upscale)
 # https://github.com/cubiq/ComfyUI_IPAdapter_plus.git            # 19
-# https://github.com/kijai/ComfyUI-KJNodes.git                   # 68 pero casi todo viejo
+
 # https://github.com/kijai/ComfyUI-Florence2.git                 # 4 — QwenVL lo reemplazó
 # https://github.com/city96/ComfyUI-GGUF.git                     # 0 usos en 2026
 # https://github.com/chrisgoringe/cg-use-everywhere.git          # 6
