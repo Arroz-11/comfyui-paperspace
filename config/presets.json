@@ -138,6 +138,59 @@
       ]}
     }
   },
+  "minimax-h3": {
+    "name": "MiniMax H3 (FL2VA)",
+    "about": "Video + native audio, 33B — t2v / i2v / first-last frame. On Ampere (A6000) use pruned fp8; int8_convrot needs torch cu130. RAM-heavy on first load",
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16 (full)", "repo": "Comfy-Org/MiniMax-H3", "file": "diffusion_models/minimax_h3_fl2va_bf16.safetensors", "gb": 61.73},
+        {"label": "pruned bf16", "repo": "Comfy-Org/MiniMax-H3", "file": "diffusion_models/minimax_h3_fl2va_pruned_bf16.safetensors", "gb": 37.46},
+        {"label": "pruned fp8 (Ampere path)", "repo": "Comfy-Org/MiniMax-H3", "file": "diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors", "gb": 19.52},
+        {"label": "pruned int8 (needs cu130)", "repo": "Comfy-Org/MiniMax-H3", "file": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors", "gb": 19.53}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/MiniMax-H3", "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors", "gb": 47.97},
+        {"label": "int8", "repo": "Comfy-Org/MiniMax-H3", "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors", "gb": 25.28},
+        {"label": "nvfp4_awq (template; no Blackwell needed)", "repo": "Comfy-Org/MiniMax-H3", "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors", "gb": 14.61}
+      ]},
+      "vae video": {"folder": "vae", "options": [
+        {"label": "fp16", "repo": "Comfy-Org/MiniMax-H3", "file": "vae/minimax_h3_video_vae_fp16.safetensors", "gb": 4.85}
+      ]},
+      "vae audio": {"folder": "vae", "options": [
+        {"label": "fp32", "repo": "Comfy-Org/MiniMax-H3", "file": "vae/minimax_h3_audio_vae_fp32.safetensors", "gb": 0.56}
+      ]},
+      "turbo lora": {"folder": "loras", "options": [
+        {"label": "8-step (template)", "repo": "Comfy-Org/MiniMax-H3", "file": "loras/minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors", "gb": 1.82},
+        {"label": "4-step 768p", "repo": "Comfy-Org/MiniMax-H3", "file": "loras/minimax_h3_fl2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors", "gb": 1.82}
+      ]}
+    }
+  },
+  "minimax-h3-ref": {
+    "name": "MiniMax H3 (Ref2VA)",
+    "about": "Reference-to-video: up to 9 images + 3 videos + 3 audios lock identity, style and voice. Shares TE/VAEs with FL2VA",
+    "components": {
+      "diffusion": {"folder": "diffusion_models", "options": [
+        {"label": "bf16 (full)", "repo": "Comfy-Org/MiniMax-H3", "file": "diffusion_models/minimax_h3_ref2va_bf16.safetensors", "gb": 61.73},
+        {"label": "pruned bf16", "repo": "Comfy-Org/MiniMax-H3", "file": "diffusion_models/minimax_h3_ref2va_pruned_bf16.safetensors", "gb": 37.46},
+        {"label": "pruned fp8 (Ampere path)", "repo": "Comfy-Org/MiniMax-H3", "file": "diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors", "gb": 19.52},
+        {"label": "pruned int8 (needs cu130)", "repo": "Comfy-Org/MiniMax-H3", "file": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors", "gb": 19.53}
+      ]},
+      "text encoder": {"folder": "text_encoders", "options": [
+        {"label": "bf16", "repo": "Comfy-Org/MiniMax-H3", "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors", "gb": 47.97},
+        {"label": "int8", "repo": "Comfy-Org/MiniMax-H3", "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors", "gb": 25.28},
+        {"label": "nvfp4_awq (template; no Blackwell needed)", "repo": "Comfy-Org/MiniMax-H3", "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors", "gb": 14.61}
+      ]},
+      "vae video": {"folder": "vae", "options": [
+        {"label": "fp16", "repo": "Comfy-Org/MiniMax-H3", "file": "vae/minimax_h3_video_vae_fp16.safetensors", "gb": 4.85}
+      ]},
+      "vae audio": {"folder": "vae", "options": [
+        {"label": "fp32", "repo": "Comfy-Org/MiniMax-H3", "file": "vae/minimax_h3_audio_vae_fp32.safetensors", "gb": 0.56}
+      ]},
+      "turbo lora": {"folder": "loras", "options": [
+        {"label": "ref2v 4-step v0.1 (template; early)", "repo": "Comfy-Org/MiniMax-H3", "file": "loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors", "gb": 1.82}
+      ]}
+    }
+  },
   "ltx-2.5": {
     "name": "LTX-2.5",
     "about": "Video + audio, 22B (distilled, 8 steps). Gated: accept the license on HF. int8 = the official ComfyUI quant (no fp8 exists)",
