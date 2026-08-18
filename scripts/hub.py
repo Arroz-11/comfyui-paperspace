@@ -490,77 +490,90 @@ def hf_ui():
                     files, dest_ui, dl_btn, bar, status, out]))
 
 
-def _hf_stream(repo, file, folder, token=None, progress=None, connections=8):
+def _cache_dir():
+    return pathlib.Path(os.environ.get("HF_HUB_CACHE")
+                        or (pathlib.Path(os.environ["HF_HOME"]) / "hub"
+                            if os.environ.get("HF_HOME") else pathlib.Path.home() / ".cache/huggingface/hub"))
+
+
+def _dir_bytes(path):
+    total = 0
+    try:
+        for p in path.rglob("*"):
+            try:
+                if p.is_file():
+                    total += p.stat().st_size
+            except OSError:
+                pass
+    except OSError:
+        pass
+    return total
+
+
+def _hf_stream(repo, file, folder, token=None, progress=None):
     """Download one HF file flat into ComfyUI/models/<folder>.
 
-    Straight to the target (no HF cache copy), using N parallel range
-    requests — HF's CDN throttles per connection, so a single stream crawls
-    while 8 of them saturate the machine's link. Falls back to one stream
-    when the server doesn't do ranges. progress(done, total, elapsed).
+    Uses hf_hub_download so the transfer rides HF's own engine (hf_transfer /
+    Xet: chunked, parallel, hundreds of MB/s). A plain requests stream — even
+    with range workers — is several times slower; that's the whole reason this
+    goes through the cache instead of writing the target directly.
+    HF's own tqdm bars are silenced and replaced by a watcher thread that
+    reports cache growth, so the panel keeps one clean progress line.
+    The file is then HARDLINKED into models/ (flat name, zero extra disk;
+    clearing the cache later never breaks it).
     """
-    import requests
-    from concurrent.futures import ThreadPoolExecutor
+    from huggingface_hub import hf_hub_download
+    from huggingface_hub.utils import disable_progress_bars, enable_progress_bars
+
     dest = MODELS / folder
     dest.mkdir(parents=True, exist_ok=True)
     target = dest / pathlib.Path(file).name
     if target.exists():
         return target, False
-    url = f"https://huggingface.co/{repo}/resolve/main/{urllib.parse.quote(file)}"
-    auth = {"Authorization": f"Bearer {token}"} if token else {}
 
-    # One authed HEAD resolves the signed CDN URL + size; workers then hit
-    # the CDN directly (signed URL needs no auth header).
-    h = requests.head(url, headers=auth, allow_redirects=True, timeout=30)
-    h.raise_for_status()
-    total = int(h.headers.get("Content-Length") or 0)
-    final_url = h.url
-    hdrs = auth if "huggingface.co" in final_url else {}
-
-    tmp = target.with_name(target.name + ".part")
-    state = {"done": 0, "t0": time.time()}
-    lock = threading.Lock()
-
-    def _tick(n):
-        with lock:
-            state["done"] += n
-            if progress:
-                progress(state["done"], total, time.time() - state["t0"])
-
-    def _single():
-        r = requests.get(final_url, headers=hdrs, stream=True, timeout=60)
-        r.raise_for_status()
-        with open(tmp, "wb") as f:
-            for chunk in r.iter_content(8 * 1024 * 1024):
-                f.write(chunk)
-                _tick(len(chunk))
-
-    def _range(start, end):
-        r = requests.get(final_url, stream=True, timeout=60,
-                         headers={**hdrs, "Range": f"bytes={start}-{end}"})
-        r.raise_for_status()
-        with open(tmp, "r+b") as f:
-            f.seek(start)
-            for chunk in r.iter_content(4 * 1024 * 1024):
-                f.write(chunk)
-                _tick(len(chunk))
-
+    total = 0
     try:
-        if total > 64 * 1024 * 1024:
-            with open(tmp, "wb") as f:      # preallocate so workers can seek
-                f.truncate(total)
-            step = total // connections
-            parts = [(i * step, (i + 1) * step - 1 if i < connections - 1 else total - 1)
-                     for i in range(connections)]
-            with ThreadPoolExecutor(max_workers=connections) as ex:
-                for fut in [ex.submit(_range, s, e) for s, e in parts]:
-                    fut.result()            # re-raise the first worker error
-        else:
-            _single()
-        if total and tmp.stat().st_size != total:
-            raise IOError(f"size mismatch: got {tmp.stat().st_size}, expected {total}")
-        tmp.rename(target)
+        import requests
+        h = requests.head(f"https://huggingface.co/{repo}/resolve/main/{urllib.parse.quote(file)}",
+                          headers={"Authorization": f"Bearer {token}"} if token else {},
+                          allow_redirects=True, timeout=30)
+        total = int(h.headers.get("Content-Length") or 0)
+    except Exception:
+        pass
+
+    repo_cache = _cache_dir() / ("models--" + repo.replace("/", "--"))
+    base = _dir_bytes(repo_cache)
+    stop = threading.Event()
+
+    def _watch():
+        t0 = time.time()
+        while not stop.wait(1.0):
+            done = max(0, _dir_bytes(repo_cache) - base)
+            if done and progress:
+                progress(done, total, time.time() - t0)
+
+    if progress:
+        threading.Thread(target=_watch, daemon=True).start()
+    disable_progress_bars()
+    try:
+        cached = hf_hub_download(repo, file, token=token)
     finally:
-        tmp.unlink(missing_ok=True)   # no half-downloaded files left behind
+        stop.set()
+        enable_progress_bars()
+
+    real = os.path.realpath(cached)
+    try:
+        os.link(real, target)
+    except OSError:                 # cross-device: copy, then drop the cache blob
+        shutil.copy2(real, target)
+        try:
+            os.remove(real)
+            if os.path.islink(cached):
+                os.remove(cached)
+        except OSError:
+            pass
+    if progress and total:
+        progress(total, total, 0)
     return target, True
 
 
