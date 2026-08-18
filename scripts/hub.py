@@ -17,6 +17,7 @@ import pathlib
 import re
 import shutil
 import subprocess
+import threading
 import time
 import urllib.parse
 from datetime import datetime
@@ -484,32 +485,74 @@ def hf_ui():
                     files, dest_ui, dl_btn, bar, status, out]))
 
 
-def _hf_stream(repo, file, folder, token=None, progress=None):
-    """Stream one HF file flat into ComfyUI/models/<folder>.
+def _hf_stream(repo, file, folder, token=None, progress=None, connections=8):
+    """Download one HF file flat into ComfyUI/models/<folder>.
 
-    Straight to the target (no HF cache copy): the file lands ONCE, where
-    ComfyUI reads it. progress(done, total, elapsed) is called per chunk.
+    Straight to the target (no HF cache copy), using N parallel range
+    requests — HF's CDN throttles per connection, so a single stream crawls
+    while 8 of them saturate the machine's link. Falls back to one stream
+    when the server doesn't do ranges. progress(done, total, elapsed).
     """
     import requests
+    from concurrent.futures import ThreadPoolExecutor
     dest = MODELS / folder
     dest.mkdir(parents=True, exist_ok=True)
     target = dest / pathlib.Path(file).name
     if target.exists():
         return target, False
     url = f"https://huggingface.co/{repo}/resolve/main/{urllib.parse.quote(file)}"
-    r = requests.get(url, stream=True, timeout=30,
-                     headers={"Authorization": f"Bearer {token}"} if token else {})
-    r.raise_for_status()
-    total = int(r.headers.get("Content-Length") or 0)
+    auth = {"Authorization": f"Bearer {token}"} if token else {}
+
+    # One authed HEAD resolves the signed CDN URL + size; workers then hit
+    # the CDN directly (signed URL needs no auth header).
+    h = requests.head(url, headers=auth, allow_redirects=True, timeout=30)
+    h.raise_for_status()
+    total = int(h.headers.get("Content-Length") or 0)
+    final_url = h.url
+    hdrs = auth if "huggingface.co" in final_url else {}
+
     tmp = target.with_name(target.name + ".part")
-    done, t0 = 0, time.time()
-    try:
+    state = {"done": 0, "t0": time.time()}
+    lock = threading.Lock()
+
+    def _tick(n):
+        with lock:
+            state["done"] += n
+            if progress:
+                progress(state["done"], total, time.time() - state["t0"])
+
+    def _single():
+        r = requests.get(final_url, headers=hdrs, stream=True, timeout=60)
+        r.raise_for_status()
         with open(tmp, "wb") as f:
             for chunk in r.iter_content(8 * 1024 * 1024):
                 f.write(chunk)
-                done += len(chunk)
-                if progress:
-                    progress(done, total, time.time() - t0)
+                _tick(len(chunk))
+
+    def _range(start, end):
+        r = requests.get(final_url, stream=True, timeout=60,
+                         headers={**hdrs, "Range": f"bytes={start}-{end}"})
+        r.raise_for_status()
+        with open(tmp, "r+b") as f:
+            f.seek(start)
+            for chunk in r.iter_content(4 * 1024 * 1024):
+                f.write(chunk)
+                _tick(len(chunk))
+
+    try:
+        if total > 64 * 1024 * 1024:
+            with open(tmp, "wb") as f:      # preallocate so workers can seek
+                f.truncate(total)
+            step = total // connections
+            parts = [(i * step, (i + 1) * step - 1 if i < connections - 1 else total - 1)
+                     for i in range(connections)]
+            with ThreadPoolExecutor(max_workers=connections) as ex:
+                for fut in [ex.submit(_range, s, e) for s, e in parts]:
+                    fut.result()            # re-raise the first worker error
+        else:
+            _single()
+        if total and tmp.stat().st_size != total:
+            raise IOError(f"size mismatch: got {tmp.stat().st_size}, expected {total}")
         tmp.rename(target)
     finally:
         tmp.unlink(missing_ok=True)   # no half-downloaded files left behind
