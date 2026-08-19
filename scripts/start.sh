@@ -141,10 +141,7 @@ else
     cd "$COMFY"
     # MPLBACKEND=Agg: safe headless matplotlib backend no matter who launched us
     # (the Jupyter kernel leaks an inline backend that breaks matplotlib nodes)
-    # --disable-pinned-memory (only if this ComfyUI knows the flag): pinned RAM
-    # scales with total RAM (~40%) and can't be reclaimed — on a 45 GB machine
-    # it starves big video models for a marginal transfer speedup.
-    nohup bash -c "source '$VENV/bin/activate' && EXTRA=\$(python main.py --help 2>&1 | grep -q 'disable-pinned-memory' && echo --disable-pinned-memory); MPLBACKEND=Agg python main.py --listen --port 6006 --disable-metadata \$EXTRA" \
+    nohup bash -c "source '$VENV/bin/activate' && MPLBACKEND=Agg python main.py --listen --port 6006 --disable-metadata" \
         > "$ROOT/logs/comfyui.log" 2>&1 &
     echo "  launched (PID $!) — log: $ROOT/logs/comfyui.log"
 fi

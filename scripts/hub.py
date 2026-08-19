@@ -70,13 +70,8 @@ VENV_ACT = COMFY / "comfyenv" / "bin" / "activate"
 # MPLBACKEND=module://matplotlib_inline... into the child; the venv's matplotlib
 # rejects it and every node importing matplotlib dies (Detail-Daemon, RES4LYF,
 # LayerStyle, Impact-Subpack, RMBG, Comfyroll). Agg = headless-safe everywhere.
-# --disable-pinned-memory applied only if this ComfyUI version knows the flag:
-# pinned RAM scales with total RAM (~40%, unreclaimable) — poison on 45 GB.
-_COMFY_CMD = ("cd '{c}' && source '{v}' && "
-              "EXTRA=$(python main.py --help 2>&1 | grep -q 'disable-pinned-memory' "
-              "&& echo --disable-pinned-memory); "
-              "MPLBACKEND=Agg nohup python main.py "
-              "--listen --port 6006 --disable-metadata $EXTRA > '{log}' 2>&1 &")
+_COMFY_CMD = ("cd '{c}' && source '{v}' && MPLBACKEND=Agg nohup python main.py "
+              "--listen --port 6006 --disable-metadata > '{log}' 2>&1 &")
 
 
 def _comfy_running():
