@@ -505,7 +505,7 @@ def _dir_bytes(path):
     return total
 
 
-def _hf_stream(repo, file, folder, token=None, progress=None):
+def _hf_stream(repo, file, folder, token=None, progress=None, rename=None):
     """Download one HF file flat into ComfyUI/models/<folder>.
 
     Uses hf_hub_download so the transfer rides HF's own engine (hf_transfer /
@@ -522,7 +522,7 @@ def _hf_stream(repo, file, folder, token=None, progress=None):
 
     dest = MODELS / folder
     dest.mkdir(parents=True, exist_ok=True)
-    target = dest / pathlib.Path(file).name
+    target = dest / (rename or pathlib.Path(file).name)
     if target.exists():
         return target, False
 
@@ -612,7 +612,8 @@ def presets_ui():
 
     def _target(comp, opt):
         folder = opt.get("folder", comp.get("folder"))
-        return MODELS / folder / pathlib.Path(opt["file"]).name, folder
+        name = opt.get("as") or pathlib.Path(opt["file"]).name
+        return MODELS / folder / name, folder
 
     def _selection():
         """[(component name, comp, chosen option)] — dropdown pick or only option."""
@@ -633,7 +634,7 @@ def presets_ui():
             rows.append(
                 f"<tr><td>{'✅' if have else '⬜'}</td>"
                 f"<td style='padding:0 10px'>{name}</td>"
-                f"<td>{pathlib.Path(opt['file']).name}</td>"
+                f"<td>{path.name}</td>"
                 f"<td style='padding-left:10px;opacity:.6'>{folder}</td>"
                 f"<td style='text-align:right;padding-left:10px'>{opt['gb']:.2f} GB</td></tr>")
         about = presets[model_dd.value].get("about", "")
@@ -652,8 +653,7 @@ def presets_ui():
             if len(opts) < 2:
                 continue   # fixed component -> table row only
             def _label(o, comp=comp):
-                have = (MODELS / o.get("folder", comp.get("folder"))
-                        / pathlib.Path(o["file"]).name).exists()
+                have = _target(comp, o)[0].exists()
                 return f"{o['label']} — {o['gb']:.2f} GB" + (" ✓" if have else "")
             dd = W.Dropdown(options=[(_label(o), i) for i, o in enumerate(opts)],
                             value=0, description=name,
@@ -680,7 +680,7 @@ def presets_ui():
                         return
             bar.layout.visibility = "visible"
             for i, (name, comp, opt) in enumerate(todo, 1):
-                fname = pathlib.Path(opt["file"]).name
+                fname = opt.get("as") or pathlib.Path(opt["file"]).name
                 folder = opt.get("folder", comp.get("folder"))
                 bar.value = (i - 1) / len(todo) * 100
 
@@ -693,7 +693,8 @@ def presets_ui():
                                  + (f"  ({speed:.0f} MB/s)" if speed else ""))
 
                 try:
-                    _hf_stream(opt["repo"], opt["file"], folder, token, _prog)
+                    _hf_stream(opt["repo"], opt["file"], folder, token, _prog,
+                               rename=opt.get("as"))
                     print(f"✅ {fname} → {folder}")
                 except Exception as e:
                     print(f"❌ {fname}: {e}")
