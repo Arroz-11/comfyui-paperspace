@@ -924,10 +924,17 @@ def _r2_client():
 
 
 def _r2_folders():
+    """Top-level prefixes AND their sub-prefixes, so nested layouts
+    (loras/minimax-h3/, mymodels/kaia/) are pickable, not just the root."""
     try:
         s3, bucket = _r2_client()
-        r = s3.list_objects_v2(Bucket=bucket, Delimiter="/")
-        return sorted(p["Prefix"].rstrip("/") for p in r.get("CommonPrefixes", []))
+        out = []
+        top = s3.list_objects_v2(Bucket=bucket, Delimiter="/")
+        for p in top.get("CommonPrefixes", []):
+            out.append(p["Prefix"].rstrip("/"))
+            sub = s3.list_objects_v2(Bucket=bucket, Delimiter="/", Prefix=p["Prefix"])
+            out += [q["Prefix"].rstrip("/") for q in sub.get("CommonPrefixes", [])]
+        return sorted(out)
     except Exception:
         return []
 
@@ -1058,8 +1065,10 @@ def r2_ui():
                     if dl_search.value and dl_search.value.lower() not in o["Key"].lower():
                         continue
                     when = o["LastModified"].strftime("%Y-%m-%d %H:%M")
-                    opts.append((f"{o['Key'].split('/')[-1]}  ({_fmt(o['Size'])})  {when}",
-                                 o["Key"]))
+                    # show the path relative to the chosen folder, so files sitting
+                    # in sub-folders are told apart instead of all looking flat
+                    rel = o["Key"][len(prefix):] if prefix else o["Key"]
+                    opts.append((f"{rel}  ({_fmt(o['Size'])})  {when}", o["Key"]))
                 dl_files.options = opts
                 print(f"✅ {len(opts)} files")
             except Exception as e:
