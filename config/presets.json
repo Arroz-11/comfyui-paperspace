@@ -229,7 +229,7 @@
  },
  "krea-2": {
   "name": "Krea 2",
-  "about": "Realistic text-to-image, 13B (Turbo, 8 steps). NSFW: SNOFS + filter bypass opcionales.",
+  "about": "Realistic text-to-image, 13B (Turbo, 8 steps).",
   "components": {
    "diffusion": {
     "folder": "diffusion_models",
@@ -288,18 +288,6 @@
      }
     ]
    },
-   "nsfw lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "SNOFS v1.3D (LoKr)",
-      "repo": "Ashen3/SNOFS",
-      "file": "Krea2/snofs_krea_v1_3D.safetensors",
-      "gb": 1.46
-     }
-    ],
-    "optional": true
-   },
    "realism lora": {
     "folder": "loras",
     "options": [
@@ -314,18 +302,6 @@
       "repo": "uzumix/realism_engine_krea2_v2",
       "file": "realism_engine_krea2_v2.safetensors",
       "gb": 1.46
-     }
-    ],
-    "optional": true
-   },
-   "filter bypass lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "FilterBypass3 (160 bytes)",
-      "repo": "uzumix/krea2filterbypass3.safetensors",
-      "file": "krea2filterbypass3.safetensors",
-      "gb": 0.01
      }
     ],
     "optional": true

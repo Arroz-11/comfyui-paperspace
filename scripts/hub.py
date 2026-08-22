@@ -579,12 +579,32 @@ class _Dummy:
 
 # ── Model presets ───────────────────────────────────────────────
 def _presets():
+    """presets.json (versionado) + presets.local.json (opcional, NO versionado).
+
+    El local hace merge por modelo y por componente, asi que sirve tanto para
+    sumar componentes a un modelo que ya existe como para agregar modelos enteros.
+    Pensado para lo que no va al repo publico."""
     try:
-        data = json.loads((ROOT / "config" / "presets.json").read_text())
-        return {k: v for k, v in data.items() if not k.startswith("_")}
+        data = json.loads((ROOT / "config" / "presets.json").read_text(encoding="utf-8"))
     except Exception as e:
         print(f"⚠ can't read config/presets.json: {e}")
         return {}
+    local_path = ROOT / "config" / "presets.local.json"
+    if local_path.exists():
+        try:
+            local = json.loads(local_path.read_text(encoding="utf-8"))
+            for model, cfg in local.items():
+                if model in data:
+                    data[model].setdefault("components", {}).update(cfg.get("components", {}))
+                    for key in ("about", "name"):
+                        if key in cfg:
+                            data[model][key] = cfg[key]
+                else:
+                    data[model] = cfg
+            print(f"✓ presets.local.json aplicado ({len(local)} modelo/s)")
+        except Exception as e:
+            print(f"⚠ presets.local.json ignorado: {e}")
+    return {k: v for k, v in data.items() if not k.startswith("_")}
 
 
 def presets_ui():

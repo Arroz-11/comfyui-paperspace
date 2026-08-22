@@ -3,6 +3,7 @@ ComfyUI/
 
 # Keys y logs — NUNCA al repo
 config/keys.json
+config/presets.local.json
 logs/
 *.log
 
