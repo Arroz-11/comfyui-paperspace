@@ -299,6 +299,23 @@
      }
     ]
    },
+   "realism lora": {
+    "folder": "loras",
+    "options": [
+     {
+      "label": "Realism Engine v3.1",
+      "repo": "uzumix/Realism_Engine_Ideogram_4_Krea_2_v3.1",
+      "file": "realism_engine_krea2_v3.1.safetensors",
+      "gb": 1.46
+     },
+     {
+      "label": "Realism Engine v2",
+      "repo": "uzumix/realism_engine_krea2_v2",
+      "file": "realism_engine_krea2_v2.safetensors",
+      "gb": 1.46
+     }
+    ]
+   },
    "filter bypass lora": {
     "folder": "loras",
     "options": [
