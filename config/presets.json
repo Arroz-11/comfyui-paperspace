@@ -297,7 +297,8 @@
       "file": "Krea2/snofs_krea_v1_3D.safetensors",
       "gb": 1.46
      }
-    ]
+    ],
+    "optional": true
    },
    "realism lora": {
     "folder": "loras",
@@ -314,7 +315,8 @@
       "file": "realism_engine_krea2_v2.safetensors",
       "gb": 1.46
      }
-    ]
+    ],
+    "optional": true
    },
    "filter bypass lora": {
     "folder": "loras",
@@ -325,7 +327,8 @@
       "file": "krea2filterbypass3.safetensors",
       "gb": 0.01
      }
-    ]
+    ],
+    "optional": true
    },
    "style lora": {
     "folder": "loras",
@@ -396,7 +399,8 @@
       "file": "loras/krea2_vintagetarot.safetensors",
       "gb": 0.44
      }
-    ]
+    ],
+    "optional": true
    }
   }
  },

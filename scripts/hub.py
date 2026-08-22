@@ -572,6 +572,11 @@ def _hf_stream(repo, file, folder, token=None, progress=None, rename=None):
     return target, True
 
 
+class _Dummy:
+    """Stand-in para un checkbox todavia no construido: cuenta como apagado."""
+    value = False
+
+
 # ── Model presets ───────────────────────────────────────────────
 def _presets():
     try:
@@ -606,6 +611,7 @@ def presets_ui():
                           layout=W.Layout(width="700px", visibility="hidden"))
     lbl = W.HTML()
     dds = {}   # component name -> Dropdown (multi-option components only)
+    chks = {}  # component name -> Checkbox (components marked "optional")
 
     def _comps():
         return presets[model_dd.value]["components"]
@@ -616,9 +622,12 @@ def presets_ui():
         return MODELS / folder / name, folder
 
     def _selection():
-        """[(component name, comp, chosen option)] — dropdown pick or only option."""
+        """[(component name, comp, chosen option)] — dropdown pick or only option.
+        Components marked "optional": true are skipped unless their checkbox is on."""
         sel = []
         for name, comp in _comps().items():
+            if comp.get("optional") and not chks.get(name, _Dummy()).value:
+                continue
             i = dds[name].value if name in dds else 0
             sel.append((name, comp, comp["options"][i]))
         return sel
@@ -647,9 +656,17 @@ def presets_ui():
 
     def _build(_=None):
         dds.clear()
+        chks.clear()
         widgets = []
         for name, comp in _comps().items():
             opts = comp["options"]
+            if comp.get("optional"):
+                # opt-in: nada opcional se baja salvo que lo tildes
+                ck = W.Checkbox(value=False, description=f"{name} (opcional)",
+                                indent=False, layout=W.Layout(width="460px"))
+                ck.observe(_render, names="value")
+                chks[name] = ck
+                widgets.append(ck)
             if len(opts) < 2:
                 continue   # fixed component -> table row only
             def _label(o, comp=comp):
