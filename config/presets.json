@@ -229,7 +229,7 @@
  },
  "krea-2": {
   "name": "Krea 2",
-  "about": "Realistic text-to-image, 13B (Turbo, 8 steps)",
+  "about": "Realistic text-to-image, 13B (Turbo, 8 steps). NSFW: SNOFS + filter bypass opcionales.",
   "components": {
    "diffusion": {
     "folder": "diffusion_models",
@@ -285,6 +285,99 @@
       "repo": "Comfy-Org/Krea-2",
       "file": "vae/qwen_image_vae.safetensors",
       "gb": 0.24
+     }
+    ]
+   },
+   "nsfw lora": {
+    "folder": "loras",
+    "options": [
+     {
+      "label": "SNOFS v1.3D (LoKr)",
+      "repo": "Ashen3/SNOFS",
+      "file": "Krea2/snofs_krea_v1_3D.safetensors",
+      "gb": 1.46
+     }
+    ]
+   },
+   "filter bypass lora": {
+    "folder": "loras",
+    "options": [
+     {
+      "label": "FilterBypass3 (160 bytes)",
+      "repo": "uzumix/krea2filterbypass3.safetensors",
+      "file": "krea2filterbypass3.safetensors",
+      "gb": 0.01
+     }
+    ]
+   },
+   "style lora": {
+    "folder": "loras",
+    "options": [
+     {
+      "label": "style reference",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_style_reference.safetensors",
+      "gb": 0.43
+     },
+     {
+      "label": "turbo (rank 64)",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_turbo_lora_rank_64_bf16.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "darkbrush",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_darkbrush.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "dotmatrix",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_dotmatrix.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "kidsdrawing",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_kidsdrawing.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "neondrip",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_neondrip.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "rainywindow",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_rainywindow.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "retroanime",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_retroanime.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "softwatercolor",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_softwatercolor.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "sunsetblur",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_sunsetblur.safetensors",
+      "gb": 0.44
+     },
+     {
+      "label": "vintagetarot",
+      "repo": "Comfy-Org/Krea-2",
+      "file": "loras/krea2_vintagetarot.safetensors",
+      "gb": 0.44
      }
     ]
    }
