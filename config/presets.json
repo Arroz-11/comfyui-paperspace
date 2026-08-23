@@ -811,6 +811,14 @@
             "official": true
           },
           {
+            "label": "int8 full",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors",
+            "gb": 31.7,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
+          },
+          {
             "label": "pruned bf16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_pruned_bf16.safetensors",
@@ -819,10 +827,19 @@
             "official": true
           },
           {
-            "label": "int8 full",
+            "label": "GGUF Q8_0 (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-FL2VA-Pruned-Q8_0.gguf",
+            "gb": 20.1,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "pruned int8",
             "repo": "Comfy-Org/MiniMax-H3",
-            "file": "diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors",
-            "gb": 31.7,
+            "file": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+            "gb": 19.53,
             "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
             "official": true
           },
@@ -835,27 +852,12 @@
             "official": true
           },
           {
-            "label": "pruned int8",
-            "repo": "Comfy-Org/MiniMax-H3",
-            "file": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
-            "gb": 19.53,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
-            "official": true
-          },
-          {
-            "label": "w4a8 mixed (pruned)",
-            "repo": "Kijai/MiniMax-H3-experimental",
-            "file": "minimax_h3_fl2va_pruned_w4a8_mixed.safetensors",
-            "gb": 11.68,
-            "official": false,
-            "note": "community (Kijai): the smallest one; experimental"
-          },
-          {
-            "label": "nvfp4 (pruned)",
-            "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
-            "file": "MiniMax_H3_FL2VA_pruned_nvfp4.safetensors",
-            "gb": 11.67,
-            "note": "community (Abiray): not published by Comfy-Org. Faster on Blackwell",
+            "label": "GGUF Q6_K (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-FL2VA-Pruned-Q6_K.gguf",
+            "gb": 15.58,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
             "official": false
           },
           {
@@ -867,30 +869,28 @@
             "official": false
           },
           {
-            "label": "GGUF Q8_0 (pruned)",
-            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
-            "file": "MiniMax-H3-FL2VA-Pruned-Q8_0.gguf",
-            "gb": 20.1,
-            "folder": "unet",
-            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
-            "official": false
-          },
-          {
-            "label": "GGUF Q6_K (pruned)",
-            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
-            "file": "MiniMax-H3-FL2VA-Pruned-Q6_K.gguf",
-            "gb": 15.58,
-            "folder": "unet",
-            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
-            "official": false
-          },
-          {
             "label": "GGUF Q5_K_M (pruned)",
             "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
             "file": "MiniMax-H3-FL2VA-Pruned-Q5_K_M.gguf",
             "gb": 13.1,
             "folder": "unet",
             "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "w4a8 mixed (pruned)",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "minimax_h3_fl2va_pruned_w4a8_mixed.safetensors",
+            "gb": 11.68,
+            "official": false,
+            "note": "community (Kijai): smallest, but MEASURED 3x SLOWER than int8 (146 vs 53 s/step). Open issue"
+          },
+          {
+            "label": "nvfp4 (pruned)",
+            "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
+            "file": "MiniMax_H3_FL2VA_pruned_nvfp4.safetensors",
+            "gb": 11.67,
+            "note": "community (Abiray): not published by Comfy-Org. Faster on Blackwell",
             "official": false
           },
           {
@@ -949,7 +949,7 @@
             "file": "minimax_h3_video_vae_int8_convrot.safetensors",
             "gb": 2.95,
             "official": false,
-            "note": "community (Kijai); requires torch cu130"
+            "note": "community (Kijai): 2x faster DECODE only (19.5s -> 10.0s), quality loss invisible. Does not affect sampling"
           }
         ]
       },
@@ -983,12 +983,20 @@
             "official": true
           },
           {
+            "label": "4-step v1.1 768p resized (rank 64)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_fl2v_turbo_4step_v1.1_768p_comfyui_resized_avg_rank_64_bf16.safetensors",
+            "gb": 0.87,
+            "note": "community (drbaph): v1.1, newer than the official v1.0",
+            "official": false
+          },
+          {
             "label": "8-step resized (rank 24)",
             "repo": "Kijai/MiniMax-H3_comfy",
             "file": "loras/minimax_h3_fl2v_lightx2v_turbo_8step_v1.0_resized_avg_rank_24_bf16.safetensors",
             "gb": 0.34,
             "official": false,
-            "note": "community (Kijai): same LoRA resized to a lower rank — 6x lighter"
+            "note": "community (Kijai): 6x lighter BUT measured to degrade — breaks camera motion and ignores the prompt in i2v"
           },
           {
             "label": "4-step 768p resized (rank 31)",
@@ -996,15 +1004,7 @@
             "file": "loras/minimax_h3_fl2v_lightx2v_turbo_4step_v1.0_768p_resized_avg_rank_31_bf16.safetensors",
             "gb": 0.41,
             "official": false,
-            "note": "community (Kijai): same LoRA resized to a lower rank — 6x lighter"
-          },
-          {
-            "label": "4-step v1.1 768p resized (rank 64)",
-            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
-            "file": "minimax_h3_fl2v_turbo_4step_v1.1_768p_comfyui_resized_avg_rank_64_bf16.safetensors",
-            "gb": 0.87,
-            "note": "community (drbaph): v1.1, newer than the official v1.0",
-            "official": false
+            "note": "community (Kijai): 6x lighter BUT measured to degrade — breaks camera motion and ignores the prompt in i2v"
           },
           {
             "label": "4-step (larryvrh, most adopted)",
@@ -1043,6 +1043,20 @@
             "official": false
           }
         ]
+      },
+      "ref lora": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "ref lora rank 256",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "loras/minimax_h3_ref_lora_rank_256_bf16.safetensors",
+            "gb": 2.4,
+            "official": false,
+            "note": "community (Kijai): pulls the character closer to the reference photo. Do NOT stack layers 0-25"
+          }
+        ]
       }
     }
   },
@@ -1062,6 +1076,14 @@
             "official": true
           },
           {
+            "label": "int8 full",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors",
+            "gb": 31.7,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
+          },
+          {
             "label": "pruned bf16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_pruned_bf16.safetensors",
@@ -1070,10 +1092,19 @@
             "official": true
           },
           {
-            "label": "int8 full",
+            "label": "GGUF Q8_0 (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-Ref2VA-Pruned-Q8_0.gguf",
+            "gb": 20.1,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "pruned int8",
             "repo": "Comfy-Org/MiniMax-H3",
-            "file": "diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors",
-            "gb": 31.7,
+            "file": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+            "gb": 19.53,
             "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
             "official": true
           },
@@ -1086,27 +1117,12 @@
             "official": true
           },
           {
-            "label": "pruned int8",
-            "repo": "Comfy-Org/MiniMax-H3",
-            "file": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
-            "gb": 19.53,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
-            "official": true
-          },
-          {
-            "label": "w4a8 mixed (pruned)",
-            "repo": "Kijai/MiniMax-H3-experimental",
-            "file": "minimax_h3_ref2va_pruned_w4a8_mixed.safetensors",
-            "gb": 10.96,
-            "official": false,
-            "note": "community (Kijai): the smallest one; experimental"
-          },
-          {
-            "label": "nvfp4 (pruned)",
-            "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
-            "file": "MiniMax_H3_Ref2VA_pruned_nvfp4.safetensors",
-            "gb": 11.67,
-            "note": "community (Abiray): not published by Comfy-Org. Faster on Blackwell",
+            "label": "GGUF Q6_K (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-Ref2VA-Pruned-Q6_K.gguf",
+            "gb": 15.58,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
             "official": false
           },
           {
@@ -1118,24 +1134,6 @@
             "official": false
           },
           {
-            "label": "GGUF Q8_0 (pruned)",
-            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
-            "file": "MiniMax-H3-Ref2VA-Pruned-Q8_0.gguf",
-            "gb": 20.1,
-            "folder": "unet",
-            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
-            "official": false
-          },
-          {
-            "label": "GGUF Q6_K (pruned)",
-            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
-            "file": "MiniMax-H3-Ref2VA-Pruned-Q6_K.gguf",
-            "gb": 15.58,
-            "folder": "unet",
-            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
-            "official": false
-          },
-          {
             "label": "GGUF Q5_K_M (pruned)",
             "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
             "file": "MiniMax-H3-Ref2VA-Pruned-Q5_K_M.gguf",
@@ -1143,6 +1141,22 @@
             "folder": "unet",
             "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
             "official": false
+          },
+          {
+            "label": "nvfp4 (pruned)",
+            "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
+            "file": "MiniMax_H3_Ref2VA_pruned_nvfp4.safetensors",
+            "gb": 11.67,
+            "note": "community (Abiray): not published by Comfy-Org. Faster on Blackwell",
+            "official": false
+          },
+          {
+            "label": "w4a8 mixed (pruned)",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "minimax_h3_ref2va_pruned_w4a8_mixed.safetensors",
+            "gb": 10.96,
+            "official": false,
+            "note": "community (Kijai): smallest, but MEASURED 3x SLOWER than int8 (146 vs 53 s/step). Open issue"
           },
           {
             "label": "GGUF Q4_K_M (pruned)",
@@ -1200,7 +1214,7 @@
             "file": "minimax_h3_video_vae_int8_convrot.safetensors",
             "gb": 2.95,
             "official": false,
-            "note": "community (Kijai); requires torch cu130"
+            "note": "community (Kijai): 2x faster DECODE only (19.5s -> 10.0s), quality loss invisible. Does not affect sampling"
           }
         ]
       },
@@ -1232,7 +1246,7 @@
             "file": "loras/minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors",
             "gb": 0.29,
             "official": false,
-            "note": "community (Kijai) resized. ⚠️ the ref2v turbo breaks identity reference"
+            "note": "community (Kijai) resized. ⚠️ the ref2v turbo breaks identity reference, and resized also degrades camera motion"
           }
         ]
       },
@@ -1261,6 +1275,20 @@
             "gb": 0.12,
             "note": "community (fal): works on t2v, i2v and r2v",
             "official": false
+          }
+        ]
+      },
+      "ref lora": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "ref lora rank 256",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "loras/minimax_h3_ref_lora_rank_256_bf16.safetensors",
+            "gb": 2.4,
+            "official": false,
+            "note": "community (Kijai): pulls the character closer to the reference photo. Do NOT stack layers 0-25"
           }
         ]
       }
@@ -1367,6 +1395,13 @@
         "folder": "loras",
         "options": [
           {
+            "label": "lightx2v v1 (old, in official template)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+            "gb": 1.14,
+            "official": true
+          },
+          {
             "label": "lightx2v 260412 rank256 (newest, 720p-trained)",
             "repo": "Kijai/WanVideo_comfy",
             "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_256_fp16.safetensors",
@@ -1379,13 +1414,6 @@
             "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors",
             "gb": 0.59,
             "official": false
-          },
-          {
-            "label": "lightx2v v1 (old, in official template)",
-            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-            "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
-            "gb": 1.14,
-            "official": true
           }
         ],
         "multi": true,
@@ -1394,6 +1422,13 @@
       "speed lora low-noise": {
         "folder": "loras",
         "options": [
+          {
+            "label": "lightx2v v1 (old, in official template)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+            "gb": 1.14,
+            "official": true
+          },
           {
             "label": "lightx2v 260412 rank256 (newest, 720p-trained)",
             "repo": "Kijai/WanVideo_comfy",
@@ -1407,13 +1442,6 @@
             "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors",
             "gb": 0.59,
             "official": false
-          },
-          {
-            "label": "lightx2v v1 (old, in official template)",
-            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-            "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
-            "gb": 1.14,
-            "official": true
           }
         ],
         "multi": true,
@@ -1504,19 +1532,19 @@
         "folder": "loras",
         "options": [
           {
+            "label": "lightx2v v1.1 (in official template)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors",
+            "gb": 1.14,
+            "official": true
+          },
+          {
             "label": "lightning Seko V2.0 rank64 (newest official)",
             "repo": "lightx2v/Wan2.2-Lightning",
             "file": "Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V2.0/high_noise_model.safetensors",
             "as": "Wan_2_2_T2V_A14B_HIGH_lightning_4step_lora_seko_v2.0_rank_64.safetensors",
             "gb": 1.14,
             "official": false
-          },
-          {
-            "label": "lightx2v v1.1 (in official template)",
-            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-            "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors",
-            "gb": 1.14,
-            "official": true
           }
         ]
       },
@@ -1524,19 +1552,19 @@
         "folder": "loras",
         "options": [
           {
+            "label": "lightx2v v1.1 (in official template)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors",
+            "gb": 1.14,
+            "official": true
+          },
+          {
             "label": "lightning Seko V2.0 rank64 (newest official)",
             "repo": "lightx2v/Wan2.2-Lightning",
             "file": "Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V2.0/low_noise_model.safetensors",
             "as": "Wan_2_2_T2V_A14B_LOW_lightning_4step_lora_seko_v2.0_rank_64.safetensors",
             "gb": 1.14,
             "official": false
-          },
-          {
-            "label": "lightx2v v1.1 (in official template)",
-            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-            "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors",
-            "gb": 1.14,
-            "official": true
           }
         ]
       }
