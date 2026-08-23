@@ -1,3 +1,3 @@
-# Los scripts corren en Linux: siempre LF, sin importar desde dónde se commitee
+# Scripts run on Linux: always LF, no matter where the commit comes from
 *.sh text eol=lf
 *.md text

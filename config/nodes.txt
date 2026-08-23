@@ -47,6 +47,6 @@ https://github.com/crystian/ComfyUI-Crystools.git
 # https://github.com/cubiq/ComfyUI_IPAdapter_plus.git            # 19
 
 # https://github.com/kijai/ComfyUI-Florence2.git                 # 4 — QwenVL lo reemplazó
-# https://github.com/city96/ComfyUI-GGUF.git                     # 0 usos en 2026
+https://github.com/city96/ComfyUI-GGUF.git                       # carga los .gguf (preset > gguf)
 # https://github.com/chrisgoringe/cg-use-everywhere.git          # 6
 # https://github.com/alexopus/ComfyUI-Image-Saver.git            # 7

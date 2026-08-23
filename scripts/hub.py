@@ -573,17 +573,17 @@ def _hf_stream(repo, file, folder, token=None, progress=None, rename=None):
 
 
 class _Dummy:
-    """Stand-in para un checkbox todavia no construido: cuenta como apagado."""
+    """Stand-in for a checkbox not built yet: counts as unchecked."""
     value = False
 
 
 # ── Model presets ───────────────────────────────────────────────
 def _presets():
-    """presets.json (versionado) + presets.local.json (opcional, NO versionado).
+    """presets.json (versioned) + presets.local.json (optional, NOT versioned).
 
-    El local hace merge por modelo y por componente, asi que sirve tanto para
-    sumar componentes a un modelo que ya existe como para agregar modelos enteros.
-    Pensado para lo que no va al repo publico."""
+    The local file merges per model and per component, so it can both add
+    components to an existing model and add whole models. Meant for anything
+    that should stay out of the public repo."""
     try:
         data = json.loads((ROOT / "config" / "presets.json").read_text(encoding="utf-8"))
     except Exception as e:
@@ -643,13 +643,19 @@ def presets_ui():
 
     def _selection():
         """[(component name, comp, chosen option)] — dropdown pick or only option.
-        Components marked "optional": true are skipped unless their checkbox is on."""
+        Components marked "optional": true are skipped unless their checkbox is on.
+        Components marked "multi": true return EVERY ticked option instead of one
+        (style LoRAs… where you may want several, or none)."""
         sel = []
         for name, comp in _comps().items():
             if comp.get("optional") and not chks.get(name, _Dummy()).value:
                 continue
-            i = dds[name].value if name in dds else 0
-            sel.append((name, comp, comp["options"][i]))
+            w = dds.get(name)
+            if comp.get("multi"):
+                for i in (w.value if w else ()):
+                    sel.append((name, comp, comp["options"][i]))
+            else:
+                sel.append((name, comp, comp["options"][w.value if w else 0]))
         return sel
 
     def _render(_=None):
@@ -681,21 +687,33 @@ def presets_ui():
         for name, comp in _comps().items():
             opts = comp["options"]
             if comp.get("optional"):
-                # opt-in: nada opcional se baja salvo que lo tildes
+                # opt-in: optional components are skipped unless ticked
                 ck = W.Checkbox(value=False, description=f"{name} (opcional)",
                                 indent=False, layout=W.Layout(width="460px"))
                 ck.observe(_render, names="value")
                 chks[name] = ck
                 widgets.append(ck)
-            if len(opts) < 2:
+            if len(opts) < 2 and not comp.get("multi"):
                 continue   # fixed component -> table row only
+
             def _label(o, comp=comp):
                 have = _target(comp, o)[0].exists()
-                return f"{o['label']} — {o['gb']:.2f} GB" + (" ✓" if have else "")
-            dd = W.Dropdown(options=[(_label(o), i) for i, o in enumerate(opts)],
-                            value=0, description=name,
-                            style={"description_width": "110px"},
-                            layout=W.Layout(width="460px"))
+                # "note" = what that build REQUIRES (cu130, Blackwell, VRAM…).
+                # Every build is listed: we do not know the user's GPU, they pick.
+                note = f"   ⚠ {o['note']}" if o.get("note") else ""
+                return f"{o['label']} — {o['gb']:.2f} GB" + (" ✓" if have else "") + note
+
+            if comp.get("multi"):
+                dd = W.SelectMultiple(
+                    options=[(_label(o), i) for i, o in enumerate(opts)],
+                    value=(), description=name, rows=min(len(opts), 8),
+                    style={"description_width": "110px"},
+                    layout=W.Layout(width="620px"))
+            else:
+                dd = W.Dropdown(options=[(_label(o), i) for i, o in enumerate(opts)],
+                                value=0, description=name,
+                                style={"description_width": "110px"},
+                                layout=W.Layout(width="620px"))
             dd.observe(_render, names="value")
             dds[name] = dd
             widgets.append(dd)
@@ -708,7 +726,7 @@ def presets_ui():
             token = _keys().get("huggingface") or None
             todo = [(name, comp, opt) for name, comp, opt in _selection()
                     if not _target(comp, opt)[0].exists()]
-            # pre-check de acceso por repo (los gated avisan ANTES de bajar 10 GB)
+            # per-repo access pre-check (gated repos warn BEFORE a 10 GB download)
             for repo in sorted({opt["repo"] for _, _, opt in todo}):
                 code, msg = hf_check(repo, token)
                 if code != "ok":
@@ -962,7 +980,7 @@ def _r2_client():
 
 def _r2_folders():
     """Top-level prefixes AND their sub-prefixes, so nested layouts
-    (loras/minimax-h3/, mymodels/kaia/) are pickable, not just the root."""
+    (loras/minimax-h3/, mymodels/<name>/) are pickable, not just the root."""
     try:
         s3, bucket = _r2_client()
         out = []

@@ -1,4 +1,4 @@
-# Se instala en la máquina, no se versiona
+# Installed on the machine, not versioned
 ComfyUI/
 
 # Keys y logs — NUNCA al repo
@@ -7,5 +7,6 @@ config/presets.local.json
 logs/
 *.log
 
-# Notas de trabajo locales (no van al repo público)
+# Local working notes (never in the public repo)
 MIS-PASOS.md
+__pycache__/

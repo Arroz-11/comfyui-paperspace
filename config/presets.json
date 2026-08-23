@@ -1,1032 +1,1295 @@
 {
- "_comment": "Model presets for Hub.ipynb — every file verified against the HF API (existence + real size). Each component lists its quant options (FIRST = default); mix freely, e.g. bf16 diffusion + fp8 text encoder. folder = subfolder of ComfyUI/models; options may override it.",
- "z-image-turbo": {
-  "name": "Z Image Turbo",
-  "about": "Fast text-to-image, 6B (8 steps, cfg 1)",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors",
-      "gb": 11.46
-     },
-     {
-      "label": "int8",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors",
-      "gb": 5.78
-     },
-     {
-      "label": "nvfp4 (Blackwell)",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors",
-      "gb": 4.2
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/text_encoders/qwen_3_4b.safetensors",
-      "gb": 7.49
-     },
-     {
-      "label": "fp8",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
-      "gb": 5.25
-     },
-     {
-      "label": "fp4",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/text_encoders/qwen_3_4b_fp4_mixed.safetensors",
-      "gb": 3.24
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/vae/ae.safetensors",
-      "gb": 0.31
-     }
-    ]
-   }
+  "_comment": "Model presets for Hub.ipynb — every file verified against the HF API (existence + real size). Each component lists its quant options (FIRST = default); mix freely, e.g. bf16 diffusion + fp8 text encoder. folder = subfolder of ComfyUI/models; options may override it.",
+  "z-image-turbo": {
+    "name": "Z Image Turbo",
+    "about": "Fast text-to-image, 6B (8 steps, cfg 1)",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors",
+            "gb": 11.46,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "GGUF Q8_0",
+            "repo": "unsloth/Z-Image-Turbo-GGUF",
+            "file": "z-image-turbo-Q8_0.gguf",
+            "gb": 6.73,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "int8",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors",
+            "gb": 5.78,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "GGUF Q4_K_M",
+            "repo": "unsloth/Z-Image-Turbo-GGUF",
+            "file": "z-image-turbo-Q4_K_M.gguf",
+            "gb": 4.67,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "nvfp4",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors",
+            "gb": 4.2,
+            "note": "runs without Blackwell, but ~2x slower outside it"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/text_encoders/qwen_3_4b.safetensors",
+            "gb": 7.49
+          },
+          {
+            "label": "fp8",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
+            "gb": 5.25,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          },
+          {
+            "label": "fp4",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/text_encoders/qwen_3_4b_fp4_mixed.safetensors",
+            "gb": 3.24,
+            "note": "runs without Blackwell, but ~2x slower outside it"
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/vae/ae.safetensors",
+            "gb": 0.31
+          }
+        ]
+      }
+    }
+  },
+  "z-image": {
+    "name": "Z Image (base)",
+    "about": "Undistilled base — for LoRA training and quality/diversity at 25-50 steps, cfg 3-5. Shares TE/VAE with Turbo",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/z_image",
+            "file": "split_files/diffusion_models/z_image_bf16.safetensors",
+            "gb": 11.46,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "int8",
+            "repo": "Comfy-Org/z_image",
+            "file": "split_files/diffusion_models/z_image_int8_convrot.safetensors",
+            "gb": 5.78,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/text_encoders/qwen_3_4b.safetensors",
+            "gb": 7.49
+          },
+          {
+            "label": "fp8",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
+            "gb": 5.25,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/vae/ae.safetensors",
+            "gb": 0.31
+          }
+        ]
+      },
+      "distill patch lora": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "8-steps patch (for base/finetunes)",
+            "repo": "Comfy-Org/z_image_turbo",
+            "file": "split_files/loras/z_image_turbo_distill_patch_lora_bf16.safetensors",
+            "gb": 0.15
+          }
+        ]
+      }
+    }
+  },
+  "flux2-klein-9b": {
+    "name": "FLUX.2 Klein 9B",
+    "about": "Editing / multi-ref (gated: accept the license on HF)",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "black-forest-labs/FLUX.2-klein-9B",
+            "file": "flux-2-klein-9b.safetensors",
+            "gb": 18.16
+          },
+          {
+            "label": "fp8",
+            "repo": "black-forest-labs/FLUX.2-klein-9b-fp8",
+            "file": "flux-2-klein-9b-fp8.safetensors",
+            "gb": 9.43,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          },
+          {
+            "label": "GGUF Q8_0",
+            "repo": "unsloth/FLUX.2-klein-9B-GGUF",
+            "file": "flux-2-klein-9b-Q8_0.gguf",
+            "gb": 9.29,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "GGUF Q6_K",
+            "repo": "unsloth/FLUX.2-klein-9B-GGUF",
+            "file": "flux-2-klein-9b-Q6_K.gguf",
+            "gb": 7.33,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "GGUF Q4_K_M",
+            "repo": "unsloth/FLUX.2-klein-9B-GGUF",
+            "file": "flux-2-klein-9b-Q4_K_M.gguf",
+            "gb": 5.5,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/flux2-klein-9B",
+            "file": "split_files/text_encoders/qwen_3_8b.safetensors",
+            "gb": 16.38
+          },
+          {
+            "label": "fp8",
+            "repo": "Comfy-Org/flux2-klein-9B",
+            "file": "split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors",
+            "gb": 8.66,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Comfy-Org/flux2-dev",
+            "file": "split_files/vae/flux2-vae.safetensors",
+            "gb": 0.34
+          }
+        ]
+      }
+    }
+  },
+  "flux2-klein-4b": {
+    "name": "FLUX.2 Klein 4B",
+    "about": "Lighter Klein for small storage",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "black-forest-labs/FLUX.2-klein-4B",
+            "file": "flux-2-klein-4b.safetensors",
+            "gb": 7.75
+          },
+          {
+            "label": "fp8",
+            "repo": "black-forest-labs/FLUX.2-klein-4b-fp8",
+            "file": "flux-2-klein-4b-fp8.safetensors",
+            "gb": 4.07,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          },
+          {
+            "label": "GGUF Q8_0",
+            "repo": "unsloth/FLUX.2-klein-4B-GGUF",
+            "file": "flux-2-klein-4b-Q8_0.gguf",
+            "gb": 4.01,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "GGUF Q6_K",
+            "repo": "unsloth/FLUX.2-klein-4B-GGUF",
+            "file": "flux-2-klein-4b-Q6_K.gguf",
+            "gb": 3.18,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "GGUF Q4_K_M",
+            "repo": "unsloth/FLUX.2-klein-4B-GGUF",
+            "file": "flux-2-klein-4b-Q4_K_M.gguf",
+            "gb": 2.43,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/flux2-klein-4B",
+            "file": "split_files/text_encoders/qwen_3_4b.safetensors",
+            "gb": 8.04
+          },
+          {
+            "label": "fp4",
+            "repo": "Comfy-Org/flux2-klein-4B",
+            "file": "split_files/text_encoders/qwen_3_4b_fp4_flux2.safetensors",
+            "gb": 3.85,
+            "note": "runs without Blackwell, but ~2x slower outside it"
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Comfy-Org/flux2-dev",
+            "file": "split_files/vae/flux2-vae.safetensors",
+            "gb": 0.34
+          }
+        ]
+      }
+    }
+  },
+  "krea-2": {
+    "name": "Krea 2",
+    "about": "Realistic text-to-image, 13B (Turbo, 8 steps).",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "diffusion_models/krea2_turbo_bf16.safetensors",
+            "gb": 24.48,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "GGUF Q8_0",
+            "repo": "vantagewithai/Krea-2-Turbo-GGUF",
+            "file": "krea2_turbo-Q8_0.gguf",
+            "gb": 12.76,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "mxfp8",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "diffusion_models/krea2_turbo_mxfp8.safetensors",
+            "gb": 12.6,
+            "note": "requires Blackwell (sm_100+)"
+          },
+          {
+            "label": "int8",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "diffusion_models/krea2_turbo_int8_convrot.safetensors",
+            "gb": 12.57,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "fp8",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "diffusion_models/krea2_turbo_fp8_scaled.safetensors",
+            "gb": 12.24,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          },
+          {
+            "label": "GGUF Q6_K",
+            "repo": "vantagewithai/Krea-2-Turbo-GGUF",
+            "file": "krea2_turbo-Q6_K.gguf",
+            "gb": 9.86,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "GGUF Q5_K_M",
+            "repo": "vantagewithai/Krea-2-Turbo-GGUF",
+            "file": "krea2_turbo-Q5_K_M.gguf",
+            "gb": 8.26,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "nvfp4",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "diffusion_models/krea2_turbo_nvfp4.safetensors",
+            "gb": 7.15,
+            "note": "runs without Blackwell, but ~2x slower outside it"
+          },
+          {
+            "label": "GGUF Q4_K_M",
+            "repo": "vantagewithai/Krea-2-Turbo-GGUF",
+            "file": "krea2_turbo-Q4_K_M.gguf",
+            "gb": 6.97,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "GGUF Q3_K_M",
+            "repo": "vantagewithai/Krea-2-Turbo-GGUF",
+            "file": "krea2_turbo-Q3_K_M.gguf",
+            "gb": 5.6,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "GGUF Q2_K",
+            "repo": "vantagewithai/Krea-2-Turbo-GGUF",
+            "file": "krea2_turbo-Q2_K.gguf",
+            "gb": 4.55,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "text_encoders/qwen3vl_4b_bf16.safetensors",
+            "gb": 8.27,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "fp8",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors",
+            "gb": 4.88,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "vae/qwen_image_vae.safetensors",
+            "gb": 0.24
+          }
+        ]
+      },
+      "turbo lora": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "turbo rank 64 (RAW only)",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_turbo_lora_rank_64_bf16.safetensors",
+            "gb": 0.44,
+            "note": "the Turbo checkpoint is already distilled; this is for the RAW one"
+          }
+        ]
+      },
+      "realism lora": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "Realism Engine v3.1",
+            "repo": "uzumix/Realism_Engine_Ideogram_4_Krea_2_v3.1",
+            "file": "realism_engine_krea2_v3.1.safetensors",
+            "gb": 1.46
+          },
+          {
+            "label": "Realism Engine v2",
+            "repo": "uzumix/realism_engine_krea2_v2",
+            "file": "realism_engine_krea2_v2.safetensors",
+            "gb": 1.46
+          }
+        ],
+        "optional": true
+      },
+      "style lora": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "style reference",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_style_reference.safetensors",
+            "gb": 0.43
+          },
+          {
+            "label": "darkbrush",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_darkbrush.safetensors",
+            "gb": 0.44
+          },
+          {
+            "label": "dotmatrix",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_dotmatrix.safetensors",
+            "gb": 0.44
+          },
+          {
+            "label": "kidsdrawing",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_kidsdrawing.safetensors",
+            "gb": 0.44
+          },
+          {
+            "label": "neondrip",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_neondrip.safetensors",
+            "gb": 0.44
+          },
+          {
+            "label": "rainywindow",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_rainywindow.safetensors",
+            "gb": 0.44
+          },
+          {
+            "label": "retroanime",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_retroanime.safetensors",
+            "gb": 0.44
+          },
+          {
+            "label": "softwatercolor",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_softwatercolor.safetensors",
+            "gb": 0.44
+          },
+          {
+            "label": "sunsetblur",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_sunsetblur.safetensors",
+            "gb": 0.44
+          },
+          {
+            "label": "vintagetarot",
+            "repo": "Comfy-Org/Krea-2",
+            "file": "loras/krea2_vintagetarot.safetensors",
+            "gb": 0.44
+          }
+        ],
+        "optional": true,
+        "multi": true
+      }
+    }
+  },
+  "qwen-image-edit": {
+    "name": "Qwen Image Edit 2511",
+    "about": "Image editing, 20B — native multi-image (up to 3 refs). Quality mode: 20-40 steps cfg 4 (Lightning LoRA ships OFF in the template)",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+            "file": "split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors",
+            "gb": 38.06,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "GGUF Q8_0",
+            "repo": "unsloth/Qwen-Image-Edit-2511-GGUF",
+            "file": "qwen-image-edit-2511-Q8_0.gguf",
+            "gb": 20.27,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "fp8mixed",
+            "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+            "file": "split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors",
+            "gb": 19.12,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          },
+          {
+            "label": "int8 (pre-Ada GPUs)",
+            "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+            "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors",
+            "gb": 19.09,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "GGUF Q4_K_M",
+            "repo": "unsloth/Qwen-Image-Edit-2511-GGUF",
+            "file": "qwen-image-edit-2511-Q4_K_M.gguf",
+            "gb": 12.34,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "full",
+            "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+            "file": "split_files/text_encoders/qwen_2.5_vl_7b.safetensors",
+            "gb": 15.45
+          },
+          {
+            "label": "fp8_scaled",
+            "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+            "file": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+            "gb": 8.74,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          },
+          {
+            "label": "nvfp4",
+            "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+            "file": "split_files/text_encoders/qwen_2.5_vl_7b_nvfp4.safetensors",
+            "gb": 5.69,
+            "note": "runs without Blackwell, but ~2x slower outside it"
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+            "file": "split_files/vae/qwen_image_vae.safetensors",
+            "gb": 0.24
+          }
+        ]
+      },
+      "lightning lora": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "4-steps (template toggle, off by default)",
+            "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+            "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+            "gb": 0.79
+          },
+          {
+            "label": "8-steps (better fast mode)",
+            "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+            "file": "Qwen-Image-Edit-2511-Lightning-8steps-V1.0-bf16.safetensors",
+            "gb": 0.79
+          }
+        ]
+      }
+    }
+  },
+  "wan-animate-2": {
+    "name": "Wan-Animate-2",
+    "about": "Character animation, 14B — reference image + driving video. 832x480, 81-frame segments, 6 steps cfg 1 (lcm)",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "diffusion_models/wan_animate_2_bf16.safetensors",
+            "gb": 30.54,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "int8",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "diffusion_models/wan_animate_2_int8_convrot.safetensors",
+            "gb": 15.51,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "distill bf16",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "diffusion_models/wan_animate_2_distill_bf16.safetensors",
+            "gb": 30.54,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "distill int8 convrot",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "diffusion_models/wan_animate_2_distill_int8_convrot.safetensors",
+            "gb": 15.51,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "text_encoders/umt5_xxl_fp16.safetensors",
+            "gb": 10.59,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "fp8",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+            "gb": 6.27,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "clip vision": {
+        "folder": "clip_vision",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "clip_vision/clip_vision_h.safetensors",
+            "gb": 1.18
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "Wan 2.1",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "vae/Wan2_1_VAE_bf16.safetensors",
+            "gb": 0.24
+          }
+        ]
+      },
+      "step-distill lora": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "lightx2v (makes base run at 6 steps)",
+            "repo": "Comfy-Org/Wan-Animate-2",
+            "file": "loras/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+            "gb": 0.69
+          }
+        ]
+      }
+    }
+  },
+  "minimax-h3": {
+    "name": "MiniMax H3 (FL2VA)",
+    "about": "Video + native audio, 33B — t2v / i2v / first-last frame. int8_convrot needs torch cu130. RAM-heavy on first load",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16 (full)",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_fl2va_bf16.safetensors",
+            "gb": 61.73,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "pruned bf16",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_fl2va_pruned_bf16.safetensors",
+            "gb": 37.46,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "int8 full",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors",
+            "gb": 31.7,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "pruned fp8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors",
+            "gb": 19.52,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          },
+          {
+            "label": "pruned int8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+            "gb": 19.53,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors",
+            "gb": 47.97,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "int8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+            "gb": 25.28,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "nvfp4_awq",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+            "gb": 14.61,
+            "note": "runs without Blackwell, but ~2x slower outside it"
+          }
+        ]
+      },
+      "vae video": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "vae/minimax_h3_video_vae_fp16.safetensors",
+            "gb": 4.85
+          }
+        ]
+      },
+      "vae audio": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "fp32",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
+            "gb": 0.56
+          }
+        ]
+      },
+      "turbo lora": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "8-step (template)",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "loras/minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
+            "gb": 1.82
+          },
+          {
+            "label": "4-step 768p",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "loras/minimax_h3_fl2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors",
+            "gb": 1.82
+          }
+        ]
+      }
+    }
+  },
+  "minimax-h3-ref": {
+    "name": "MiniMax H3 (Ref2VA)",
+    "about": "Reference-to-video: up to 9 images + 3 videos + 3 audios lock identity, style and voice. Shares TE/VAEs with FL2VA",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "bf16 (full)",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_ref2va_bf16.safetensors",
+            "gb": 61.73,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "pruned bf16",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_ref2va_pruned_bf16.safetensors",
+            "gb": 37.46,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "int8 full",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors",
+            "gb": 31.7,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "pruned fp8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
+            "gb": 19.52,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          },
+          {
+            "label": "pruned int8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+            "gb": 19.53,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors",
+            "gb": 47.97,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "int8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+            "gb": 25.28,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "nvfp4_awq",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+            "gb": 14.61,
+            "note": "runs without Blackwell, but ~2x slower outside it"
+          }
+        ]
+      },
+      "vae video": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "vae/minimax_h3_video_vae_fp16.safetensors",
+            "gb": 4.85
+          }
+        ]
+      },
+      "vae audio": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "fp32",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
+            "gb": 0.56
+          }
+        ]
+      },
+      "turbo lora": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "ref2v 4-step v0.1 (template; early)",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
+            "gb": 1.82
+          }
+        ]
+      }
+    }
+  },
+  "wan-2.2": {
+    "name": "Wan 2.2 (i2v)",
+    "about": "Image to video, 14B MoE — needs BOTH experts (high-noise = motion/layout, low-noise = detail). 720x1280, 81 frames, 16 fps native. Output at 32 fps if you RIFE x2",
+    "components": {
+      "diffusion high-noise": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors",
+            "gb": 26.62,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "GGUF Q8_0",
+            "repo": "QuantStack/Wan2.2-I2V-A14B-GGUF",
+            "file": "HighNoise/Wan2.2-I2V-A14B-HighNoise-Q8_0.gguf",
+            "gb": 15.0,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "fp8_scaled",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+            "gb": 13.31,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "diffusion low-noise": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors",
+            "gb": 26.62,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "GGUF Q8_0",
+            "repo": "QuantStack/Wan2.2-I2V-A14B-GGUF",
+            "file": "LowNoise/Wan2.2-I2V-A14B-LowNoise-Q8_0.gguf",
+            "gb": 15.0,
+            "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
+            "folder": "unet"
+          },
+          {
+            "label": "fp8_scaled",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+            "gb": 13.31,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
+            "gb": 10.59,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "fp8_scaled",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+            "gb": 6.27,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "Wan 2.1 (for all 14B)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/vae/wan_2.1_vae.safetensors",
+            "gb": 0.24
+          }
+        ]
+      },
+      "speed lora high-noise": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "lightx2v 260412 rank256 (newest, 720p-trained)",
+            "repo": "Kijai/WanVideo_comfy",
+            "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_256_fp16.safetensors",
+            "gb": 2.33
+          },
+          {
+            "label": "lightx2v 260412 rank64",
+            "repo": "Kijai/WanVideo_comfy",
+            "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors",
+            "gb": 0.59
+          },
+          {
+            "label": "lightx2v v1 (old, in official template)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+            "gb": 1.14
+          }
+        ],
+        "multi": true,
+        "optional": true
+      },
+      "speed lora low-noise": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "lightx2v 260412 rank256 (newest, 720p-trained)",
+            "repo": "Kijai/WanVideo_comfy",
+            "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_256_fp16.safetensors",
+            "gb": 2.33
+          },
+          {
+            "label": "lightx2v 260412 rank64",
+            "repo": "Kijai/WanVideo_comfy",
+            "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors",
+            "gb": 0.59
+          },
+          {
+            "label": "lightx2v v1 (old, in official template)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+            "gb": 1.14
+          }
+        ],
+        "multi": true,
+        "optional": true
+      }
+    }
+  },
+  "wan-2.2-t2v": {
+    "name": "Wan 2.2 (t2v)",
+    "about": "Text to video, 14B MoE — needs BOTH experts. Text encoder + VAE are shared with the i2v preset (they'll show ✓ if you have it). 1280x720, 81-121 frames, 16 fps native — RIFE x2 => 32 fps output",
+    "components": {
+      "diffusion high-noise": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp16.safetensors",
+            "gb": 26.61,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "fp8_scaled",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
+            "gb": 13.31,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "diffusion low-noise": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp16.safetensors",
+            "gb": 26.61,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "fp8_scaled",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
+            "gb": 13.31,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
+            "gb": 10.59,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "fp8_scaled",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+            "gb": 6.27,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+          }
+        ]
+      },
+      "vae": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "Wan 2.1 (for all 14B)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/vae/wan_2.1_vae.safetensors",
+            "gb": 0.24
+          }
+        ]
+      },
+      "speed lora high-noise": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "lightning Seko V2.0 rank64 (newest official)",
+            "repo": "lightx2v/Wan2.2-Lightning",
+            "file": "Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V2.0/high_noise_model.safetensors",
+            "as": "Wan_2_2_T2V_A14B_HIGH_lightning_4step_lora_seko_v2.0_rank_64.safetensors",
+            "gb": 1.14
+          },
+          {
+            "label": "lightx2v v1.1 (in official template)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors",
+            "gb": 1.14
+          }
+        ]
+      },
+      "speed lora low-noise": {
+        "folder": "loras",
+        "options": [
+          {
+            "label": "lightning Seko V2.0 rank64 (newest official)",
+            "repo": "lightx2v/Wan2.2-Lightning",
+            "file": "Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V2.0/low_noise_model.safetensors",
+            "as": "Wan_2_2_T2V_A14B_LOW_lightning_4step_lora_seko_v2.0_rank_64.safetensors",
+            "gb": 1.14
+          },
+          {
+            "label": "lightx2v v1.1 (in official template)",
+            "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+            "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors",
+            "gb": 1.14
+          }
+        ]
+      }
+    }
+  },
+  "ltx-2.5": {
+    "name": "LTX-2.5",
+    "about": "Video + audio, 22B (distilled, 8 steps). Gated: accept the license on HF. int8 = the official ComfyUI quant (no fp8 exists)",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "dev bf16",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "diffusion_models/ltx-2.5-22b-dev-transformer-bf16.safetensors",
+            "gb": 39.13,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "dev int8",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "diffusion_models/ltx-2.5-22b-dev-transformer-comfy-int8-convrot.safetensors",
+            "gb": 20.03,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "distilled bf16",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-bf16.safetensors",
+            "gb": 39.13,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "distilled int8",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
+            "gb": 20.03,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          },
+          {
+            "label": "distilled nvfp4",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-nvfp4.safetensors",
+            "gb": 17.44,
+            "note": "runs without Blackwell, but ~2x slower outside it"
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "bf16",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-bf16.safetensors",
+            "gb": 24.46,
+            "note": "no special requirements; highest VRAM"
+          },
+          {
+            "label": "int8",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
+            "gb": 14.32,
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+          }
+        ]
+      },
+      "vae video": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
+            "gb": 1.37
+          }
+        ]
+      },
+      "vae audio": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
+            "gb": 0.34
+          }
+        ]
+      },
+      "spatial upscaler": {
+        "folder": "latent_upscale_models",
+        "options": [
+          {
+            "label": "default",
+            "repo": "Lightricks/LTX-2.5",
+            "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+            "gb": 0.93
+          }
+        ]
+      },
+      "prompt enhancer": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "gemma4 e2b",
+            "repo": "Comfy-Org/gemma-4",
+            "file": "text_encoders/gemma4_e2b_it_bf16.safetensors",
+            "gb": 9.57
+          }
+        ]
+      }
+    }
   }
- },
- "z-image": {
-  "name": "Z Image (base)",
-  "about": "Undistilled base — for LoRA training and quality/diversity at 25-50 steps, cfg 3-5. Shares TE/VAE with Turbo",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/z_image",
-      "file": "split_files/diffusion_models/z_image_bf16.safetensors",
-      "gb": 11.46
-     },
-     {
-      "label": "int8",
-      "repo": "Comfy-Org/z_image",
-      "file": "split_files/diffusion_models/z_image_int8_convrot.safetensors",
-      "gb": 5.78
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/text_encoders/qwen_3_4b.safetensors",
-      "gb": 7.49
-     },
-     {
-      "label": "fp8",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
-      "gb": 5.25
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/vae/ae.safetensors",
-      "gb": 0.31
-     }
-    ]
-   },
-   "distill patch lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "8-steps patch (for base/finetunes)",
-      "repo": "Comfy-Org/z_image_turbo",
-      "file": "split_files/loras/z_image_turbo_distill_patch_lora_bf16.safetensors",
-      "gb": 0.15
-     }
-    ]
-   }
-  }
- },
- "flux2-klein-9b": {
-  "name": "FLUX.2 Klein 9B",
-  "about": "Editing / multi-ref (gated: accept the license on HF)",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "black-forest-labs/FLUX.2-klein-9B",
-      "file": "flux-2-klein-9b.safetensors",
-      "gb": 18.16
-     },
-     {
-      "label": "fp8",
-      "repo": "black-forest-labs/FLUX.2-klein-9b-fp8",
-      "file": "flux-2-klein-9b-fp8.safetensors",
-      "gb": 9.43
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/flux2-klein-9B",
-      "file": "split_files/text_encoders/qwen_3_8b.safetensors",
-      "gb": 16.38
-     },
-     {
-      "label": "fp8",
-      "repo": "Comfy-Org/flux2-klein-9B",
-      "file": "split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors",
-      "gb": 8.66
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Comfy-Org/flux2-dev",
-      "file": "split_files/vae/flux2-vae.safetensors",
-      "gb": 0.34
-     }
-    ]
-   }
-  }
- },
- "flux2-klein-4b": {
-  "name": "FLUX.2 Klein 4B",
-  "about": "Lighter Klein for small storage",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "black-forest-labs/FLUX.2-klein-4B",
-      "file": "flux-2-klein-4b.safetensors",
-      "gb": 7.75
-     },
-     {
-      "label": "fp8",
-      "repo": "black-forest-labs/FLUX.2-klein-4b-fp8",
-      "file": "flux-2-klein-4b-fp8.safetensors",
-      "gb": 4.07
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/flux2-klein-4B",
-      "file": "split_files/text_encoders/qwen_3_4b.safetensors",
-      "gb": 8.04
-     },
-     {
-      "label": "fp4",
-      "repo": "Comfy-Org/flux2-klein-4B",
-      "file": "split_files/text_encoders/qwen_3_4b_fp4_flux2.safetensors",
-      "gb": 3.85
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Comfy-Org/flux2-dev",
-      "file": "split_files/vae/flux2-vae.safetensors",
-      "gb": 0.34
-     }
-    ]
-   }
-  }
- },
- "krea-2": {
-  "name": "Krea 2",
-  "about": "Realistic text-to-image, 13B (Turbo, 8 steps).",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "diffusion_models/krea2_turbo_bf16.safetensors",
-      "gb": 24.48
-     },
-     {
-      "label": "fp8",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "diffusion_models/krea2_turbo_fp8_scaled.safetensors",
-      "gb": 12.24
-     },
-     {
-      "label": "int8",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "diffusion_models/krea2_turbo_int8_convrot.safetensors",
-      "gb": 12.57
-     },
-     {
-      "label": "nvfp4 (Blackwell)",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "diffusion_models/krea2_turbo_nvfp4.safetensors",
-      "gb": 7.15
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "text_encoders/qwen3vl_4b_bf16.safetensors",
-      "gb": 8.27
-     },
-     {
-      "label": "fp8",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors",
-      "gb": 4.88
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "vae/qwen_image_vae.safetensors",
-      "gb": 0.24
-     }
-    ]
-   },
-   "realism lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "Realism Engine v3.1",
-      "repo": "uzumix/Realism_Engine_Ideogram_4_Krea_2_v3.1",
-      "file": "realism_engine_krea2_v3.1.safetensors",
-      "gb": 1.46
-     },
-     {
-      "label": "Realism Engine v2",
-      "repo": "uzumix/realism_engine_krea2_v2",
-      "file": "realism_engine_krea2_v2.safetensors",
-      "gb": 1.46
-     }
-    ],
-    "optional": true
-   },
-   "style lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "style reference",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_style_reference.safetensors",
-      "gb": 0.43
-     },
-     {
-      "label": "turbo (rank 64)",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_turbo_lora_rank_64_bf16.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "darkbrush",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_darkbrush.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "dotmatrix",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_dotmatrix.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "kidsdrawing",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_kidsdrawing.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "neondrip",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_neondrip.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "rainywindow",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_rainywindow.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "retroanime",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_retroanime.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "softwatercolor",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_softwatercolor.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "sunsetblur",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_sunsetblur.safetensors",
-      "gb": 0.44
-     },
-     {
-      "label": "vintagetarot",
-      "repo": "Comfy-Org/Krea-2",
-      "file": "loras/krea2_vintagetarot.safetensors",
-      "gb": 0.44
-     }
-    ],
-    "optional": true
-   }
-  }
- },
- "qwen-image-edit": {
-  "name": "Qwen Image Edit 2511",
-  "about": "Image editing, 20B — native multi-image (up to 3 refs). Quality mode: 20-40 steps cfg 4 (Lightning LoRA ships OFF in the template)",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
-      "file": "split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors",
-      "gb": 38.06
-     },
-     {
-      "label": "fp8mixed (template)",
-      "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
-      "file": "split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors",
-      "gb": 19.12
-     },
-     {
-      "label": "int8 (pre-Ada GPUs)",
-      "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
-      "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors",
-      "gb": 19.09
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "full",
-      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
-      "file": "split_files/text_encoders/qwen_2.5_vl_7b.safetensors",
-      "gb": 15.45
-     },
-     {
-      "label": "fp8_scaled (template)",
-      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
-      "file": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
-      "gb": 8.74
-     },
-     {
-      "label": "nvfp4 (Blackwell)",
-      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
-      "file": "split_files/text_encoders/qwen_2.5_vl_7b_nvfp4.safetensors",
-      "gb": 5.69
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
-      "file": "split_files/vae/qwen_image_vae.safetensors",
-      "gb": 0.24
-     }
-    ]
-   },
-   "lightning lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "4-steps (template toggle, off by default)",
-      "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
-      "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
-      "gb": 0.79
-     },
-     {
-      "label": "8-steps (better fast mode)",
-      "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
-      "file": "Qwen-Image-Edit-2511-Lightning-8steps-V1.0-bf16.safetensors",
-      "gb": 0.79
-     }
-    ]
-   }
-  }
- },
- "wan-animate-2": {
-  "name": "Wan-Animate-2",
-  "about": "Character animation, 14B — reference image + driving video. 832x480, 81-frame segments, 6 steps cfg 1 (lcm)",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/Wan-Animate-2",
-      "file": "diffusion_models/wan_animate_2_bf16.safetensors",
-      "gb": 30.54
-     },
-     {
-      "label": "int8 (template)",
-      "repo": "Comfy-Org/Wan-Animate-2",
-      "file": "diffusion_models/wan_animate_2_int8_convrot.safetensors",
-      "gb": 15.51
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/Wan-Animate-2",
-      "file": "text_encoders/umt5_xxl_fp16.safetensors",
-      "gb": 10.59
-     },
-     {
-      "label": "fp8 (template)",
-      "repo": "Comfy-Org/Wan-Animate-2",
-      "file": "text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
-      "gb": 6.27
-     }
-    ]
-   },
-   "clip vision": {
-    "folder": "clip_vision",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Comfy-Org/Wan-Animate-2",
-      "file": "clip_vision/clip_vision_h.safetensors",
-      "gb": 1.18
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "Wan 2.1",
-      "repo": "Comfy-Org/Wan-Animate-2",
-      "file": "vae/Wan2_1_VAE_bf16.safetensors",
-      "gb": 0.24
-     }
-    ]
-   },
-   "step-distill lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "lightx2v (makes base run at 6 steps)",
-      "repo": "Comfy-Org/Wan-Animate-2",
-      "file": "loras/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
-      "gb": 0.69
-     }
-    ]
-   }
-  }
- },
- "minimax-h3": {
-  "name": "MiniMax H3 (FL2VA)",
-  "about": "Video + native audio, 33B — t2v / i2v / first-last frame. On Ampere (A6000) use pruned fp8; int8_convrot needs torch cu130. RAM-heavy on first load",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16 (full)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "diffusion_models/minimax_h3_fl2va_bf16.safetensors",
-      "gb": 61.73
-     },
-     {
-      "label": "pruned bf16",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "diffusion_models/minimax_h3_fl2va_pruned_bf16.safetensors",
-      "gb": 37.46
-     },
-     {
-      "label": "pruned fp8 (Ampere path)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors",
-      "gb": 19.52
-     },
-     {
-      "label": "pruned int8 (needs cu130)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
-      "gb": 19.53
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors",
-      "gb": 47.97
-     },
-     {
-      "label": "int8",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
-      "gb": 25.28
-     },
-     {
-      "label": "nvfp4_awq (template; no Blackwell needed)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
-      "gb": 14.61
-     }
-    ]
-   },
-   "vae video": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "vae/minimax_h3_video_vae_fp16.safetensors",
-      "gb": 4.85
-     }
-    ]
-   },
-   "vae audio": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "fp32",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
-      "gb": 0.56
-     }
-    ]
-   },
-   "turbo lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "8-step (template)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "loras/minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
-      "gb": 1.82
-     },
-     {
-      "label": "4-step 768p",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "loras/minimax_h3_fl2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors",
-      "gb": 1.82
-     }
-    ]
-   }
-  }
- },
- "minimax-h3-ref": {
-  "name": "MiniMax H3 (Ref2VA)",
-  "about": "Reference-to-video: up to 9 images + 3 videos + 3 audios lock identity, style and voice. Shares TE/VAEs with FL2VA",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16 (full)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "diffusion_models/minimax_h3_ref2va_bf16.safetensors",
-      "gb": 61.73
-     },
-     {
-      "label": "pruned bf16",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "diffusion_models/minimax_h3_ref2va_pruned_bf16.safetensors",
-      "gb": 37.46
-     },
-     {
-      "label": "pruned fp8 (Ampere path)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
-      "gb": 19.52
-     },
-     {
-      "label": "pruned int8 (needs cu130)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
-      "gb": 19.53
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors",
-      "gb": 47.97
-     },
-     {
-      "label": "int8",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
-      "gb": 25.28
-     },
-     {
-      "label": "nvfp4_awq (template; no Blackwell needed)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
-      "gb": 14.61
-     }
-    ]
-   },
-   "vae video": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "vae/minimax_h3_video_vae_fp16.safetensors",
-      "gb": 4.85
-     }
-    ]
-   },
-   "vae audio": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "fp32",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
-      "gb": 0.56
-     }
-    ]
-   },
-   "turbo lora": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "ref2v 4-step v0.1 (template; early)",
-      "repo": "Comfy-Org/MiniMax-H3",
-      "file": "loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
-      "gb": 1.82
-     }
-    ]
-   }
-  }
- },
- "wan-2.2": {
-  "name": "Wan 2.2 (i2v)",
-  "about": "Image to video, 14B MoE — needs BOTH experts (high-noise = motion/layout, low-noise = detail). 720x1280, 81 frames, 16 fps native. Output at 32 fps if you RIFE x2",
-  "components": {
-   "diffusion high-noise": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors",
-      "gb": 26.62
-     },
-     {
-      "label": "fp8_scaled",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
-      "gb": 13.31
-     }
-    ]
-   },
-   "diffusion low-noise": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors",
-      "gb": 26.62
-     },
-     {
-      "label": "fp8_scaled",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
-      "gb": 13.31
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
-      "gb": 10.59
-     },
-     {
-      "label": "fp8_scaled",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
-      "gb": 6.27
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "Wan 2.1 (for all 14B)",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/vae/wan_2.1_vae.safetensors",
-      "gb": 0.24
-     }
-    ]
-   },
-   "speed lora high-noise": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "lightx2v 260412 rank256 (newest, 720p-trained)",
-      "repo": "Kijai/WanVideo_comfy",
-      "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_256_fp16.safetensors",
-      "gb": 2.33
-     },
-     {
-      "label": "lightx2v 260412 rank64",
-      "repo": "Kijai/WanVideo_comfy",
-      "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors",
-      "gb": 0.59
-     },
-     {
-      "label": "lightx2v v1 (old, in official template)",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
-      "gb": 1.14
-     }
-    ]
-   },
-   "speed lora low-noise": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "lightx2v 260412 rank256 (newest, 720p-trained)",
-      "repo": "Kijai/WanVideo_comfy",
-      "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_256_fp16.safetensors",
-      "gb": 2.33
-     },
-     {
-      "label": "lightx2v 260412 rank64",
-      "repo": "Kijai/WanVideo_comfy",
-      "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors",
-      "gb": 0.59
-     },
-     {
-      "label": "lightx2v v1 (old, in official template)",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
-      "gb": 1.14
-     }
-    ]
-   }
-  }
- },
- "wan-2.2-t2v": {
-  "name": "Wan 2.2 (t2v)",
-  "about": "Text to video, 14B MoE — needs BOTH experts. Text encoder + VAE are shared with the i2v preset (they'll show ✓ if you have it). 1280x720, 81-121 frames, 16 fps native — RIFE x2 => 32 fps output",
-  "components": {
-   "diffusion high-noise": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp16.safetensors",
-      "gb": 26.61
-     },
-     {
-      "label": "fp8_scaled",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
-      "gb": 13.31
-     }
-    ]
-   },
-   "diffusion low-noise": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp16.safetensors",
-      "gb": 26.61
-     },
-     {
-      "label": "fp8_scaled",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
-      "gb": 13.31
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "fp16",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
-      "gb": 10.59
-     },
-     {
-      "label": "fp8_scaled",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
-      "gb": 6.27
-     }
-    ]
-   },
-   "vae": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "Wan 2.1 (for all 14B)",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/vae/wan_2.1_vae.safetensors",
-      "gb": 0.24
-     }
-    ]
-   },
-   "speed lora high-noise": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "lightning Seko V2.0 rank64 (newest official)",
-      "repo": "lightx2v/Wan2.2-Lightning",
-      "file": "Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V2.0/high_noise_model.safetensors",
-      "as": "Wan_2_2_T2V_A14B_HIGH_lightning_4step_lora_seko_v2.0_rank_64.safetensors",
-      "gb": 1.14
-     },
-     {
-      "label": "lightx2v v1.1 (in official template)",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors",
-      "gb": 1.14
-     }
-    ]
-   },
-   "speed lora low-noise": {
-    "folder": "loras",
-    "options": [
-     {
-      "label": "lightning Seko V2.0 rank64 (newest official)",
-      "repo": "lightx2v/Wan2.2-Lightning",
-      "file": "Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V2.0/low_noise_model.safetensors",
-      "as": "Wan_2_2_T2V_A14B_LOW_lightning_4step_lora_seko_v2.0_rank_64.safetensors",
-      "gb": 1.14
-     },
-     {
-      "label": "lightx2v v1.1 (in official template)",
-      "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-      "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors",
-      "gb": 1.14
-     }
-    ]
-   }
-  }
- },
- "ltx-2.5": {
-  "name": "LTX-2.5",
-  "about": "Video + audio, 22B (distilled, 8 steps). Gated: accept the license on HF. int8 = the official ComfyUI quant (no fp8 exists)",
-  "components": {
-   "diffusion": {
-    "folder": "diffusion_models",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Lightricks/LTX-2.5",
-      "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-bf16.safetensors",
-      "gb": 39.13
-     },
-     {
-      "label": "int8 (template)",
-      "repo": "Lightricks/LTX-2.5",
-      "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
-      "gb": 20.03
-     },
-     {
-      "label": "nvfp4 (Blackwell)",
-      "repo": "Lightricks/LTX-2.5",
-      "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-nvfp4.safetensors",
-      "gb": 17.44
-     }
-    ]
-   },
-   "text encoder": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "bf16",
-      "repo": "Lightricks/LTX-2.5",
-      "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-bf16.safetensors",
-      "gb": 24.46
-     },
-     {
-      "label": "int8 (template)",
-      "repo": "Lightricks/LTX-2.5",
-      "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
-      "gb": 14.32
-     }
-    ]
-   },
-   "vae video": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Lightricks/LTX-2.5",
-      "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
-      "gb": 1.37
-     }
-    ]
-   },
-   "vae audio": {
-    "folder": "vae",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Lightricks/LTX-2.5",
-      "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
-      "gb": 0.34
-     }
-    ]
-   },
-   "spatial upscaler": {
-    "folder": "latent_upscale_models",
-    "options": [
-     {
-      "label": "default",
-      "repo": "Lightricks/LTX-2.5",
-      "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
-      "gb": 0.93
-     }
-    ]
-   },
-   "prompt enhancer": {
-    "folder": "text_encoders",
-    "options": [
-     {
-      "label": "gemma4 e2b",
-      "repo": "Comfy-Org/gemma-4",
-      "file": "text_encoders/gemma4_e2b_it_bf16.safetensors",
-      "gb": 9.57
-     }
-    ]
-   }
-  }
- }
 }
