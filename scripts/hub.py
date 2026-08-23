@@ -701,7 +701,10 @@ def presets_ui():
                 # "note" = what that build REQUIRES (cu130, Blackwell, VRAM…).
                 # Every build is listed: we do not know the user's GPU, they pick.
                 note = f"   ⚠ {o['note']}" if o.get("note") else ""
-                return f"{o['label']} — {o['gb']:.2f} GB" + (" ✓" if have else "") + note
+                # "official": false marks a community build. Both are listed — the tag
+                # tells them apart, it does not filter: we do not know the user's setup.
+                tag = "" if o.get("official", True) else "[community] "
+                return f"{tag}{o['label']} — {o['gb']:.2f} GB" + (" ✓" if have else "") + note
 
             if comp.get("multi"):
                 dd = W.SelectMultiple(

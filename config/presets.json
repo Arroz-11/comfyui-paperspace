@@ -12,7 +12,8 @@
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/diffusion_models/z_image_turbo_bf16.safetensors",
             "gb": 11.46,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "GGUF Q8_0",
@@ -20,14 +21,16 @@
             "file": "z-image-turbo-Q8_0.gguf",
             "gb": 6.73,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "int8",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors",
             "gb": 5.78,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "GGUF Q4_K_M",
@@ -35,14 +38,16 @@
             "file": "z-image-turbo-Q4_K_M.gguf",
             "gb": 4.67,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "nvfp4",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/diffusion_models/z_image_turbo_nvfp4.safetensors",
             "gb": 4.2,
-            "note": "runs without Blackwell, but ~2x slower outside it"
+            "note": "runs without Blackwell, but ~2x slower outside it",
+            "official": true
           }
         ]
       },
@@ -53,21 +58,24 @@
             "label": "bf16",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/text_encoders/qwen_3_4b.safetensors",
-            "gb": 7.49
+            "gb": 7.49,
+            "official": true
           },
           {
             "label": "fp8",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
             "gb": 5.25,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           },
           {
             "label": "fp4",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/text_encoders/qwen_3_4b_fp4_mixed.safetensors",
             "gb": 3.24,
-            "note": "runs without Blackwell, but ~2x slower outside it"
+            "note": "runs without Blackwell, but ~2x slower outside it",
+            "official": true
           }
         ]
       },
@@ -78,7 +86,8 @@
             "label": "default",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/vae/ae.safetensors",
-            "gb": 0.31
+            "gb": 0.31,
+            "official": true
           }
         ]
       }
@@ -96,14 +105,16 @@
             "repo": "Comfy-Org/z_image",
             "file": "split_files/diffusion_models/z_image_bf16.safetensors",
             "gb": 11.46,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "int8",
             "repo": "Comfy-Org/z_image",
             "file": "split_files/diffusion_models/z_image_int8_convrot.safetensors",
             "gb": 5.78,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           }
         ]
       },
@@ -114,14 +125,16 @@
             "label": "bf16",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/text_encoders/qwen_3_4b.safetensors",
-            "gb": 7.49
+            "gb": 7.49,
+            "official": true
           },
           {
             "label": "fp8",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
             "gb": 5.25,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -132,7 +145,8 @@
             "label": "default",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/vae/ae.safetensors",
-            "gb": 0.31
+            "gb": 0.31,
+            "official": true
           }
         ]
       },
@@ -143,7 +157,8 @@
             "label": "8-steps patch (for base/finetunes)",
             "repo": "Comfy-Org/z_image_turbo",
             "file": "split_files/loras/z_image_turbo_distill_patch_lora_bf16.safetensors",
-            "gb": 0.15
+            "gb": 0.15,
+            "official": true
           }
         ]
       }
@@ -160,14 +175,16 @@
             "label": "bf16",
             "repo": "black-forest-labs/FLUX.2-klein-9B",
             "file": "flux-2-klein-9b.safetensors",
-            "gb": 18.16
+            "gb": 18.16,
+            "official": true
           },
           {
             "label": "fp8",
             "repo": "black-forest-labs/FLUX.2-klein-9b-fp8",
             "file": "flux-2-klein-9b-fp8.safetensors",
             "gb": 9.43,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           },
           {
             "label": "GGUF Q8_0",
@@ -175,7 +192,8 @@
             "file": "flux-2-klein-9b-Q8_0.gguf",
             "gb": 9.29,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "GGUF Q6_K",
@@ -183,7 +201,8 @@
             "file": "flux-2-klein-9b-Q6_K.gguf",
             "gb": 7.33,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "GGUF Q4_K_M",
@@ -191,7 +210,8 @@
             "file": "flux-2-klein-9b-Q4_K_M.gguf",
             "gb": 5.5,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           }
         ]
       },
@@ -202,14 +222,16 @@
             "label": "bf16",
             "repo": "Comfy-Org/flux2-klein-9B",
             "file": "split_files/text_encoders/qwen_3_8b.safetensors",
-            "gb": 16.38
+            "gb": 16.38,
+            "official": true
           },
           {
             "label": "fp8",
             "repo": "Comfy-Org/flux2-klein-9B",
             "file": "split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors",
             "gb": 8.66,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -220,7 +242,8 @@
             "label": "default",
             "repo": "Comfy-Org/flux2-dev",
             "file": "split_files/vae/flux2-vae.safetensors",
-            "gb": 0.34
+            "gb": 0.34,
+            "official": true
           }
         ]
       }
@@ -237,14 +260,16 @@
             "label": "bf16",
             "repo": "black-forest-labs/FLUX.2-klein-4B",
             "file": "flux-2-klein-4b.safetensors",
-            "gb": 7.75
+            "gb": 7.75,
+            "official": true
           },
           {
             "label": "fp8",
             "repo": "black-forest-labs/FLUX.2-klein-4b-fp8",
             "file": "flux-2-klein-4b-fp8.safetensors",
             "gb": 4.07,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           },
           {
             "label": "GGUF Q8_0",
@@ -252,7 +277,8 @@
             "file": "flux-2-klein-4b-Q8_0.gguf",
             "gb": 4.01,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "GGUF Q6_K",
@@ -260,7 +286,8 @@
             "file": "flux-2-klein-4b-Q6_K.gguf",
             "gb": 3.18,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "GGUF Q4_K_M",
@@ -268,7 +295,8 @@
             "file": "flux-2-klein-4b-Q4_K_M.gguf",
             "gb": 2.43,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           }
         ]
       },
@@ -279,14 +307,16 @@
             "label": "bf16",
             "repo": "Comfy-Org/flux2-klein-4B",
             "file": "split_files/text_encoders/qwen_3_4b.safetensors",
-            "gb": 8.04
+            "gb": 8.04,
+            "official": true
           },
           {
             "label": "fp4",
             "repo": "Comfy-Org/flux2-klein-4B",
             "file": "split_files/text_encoders/qwen_3_4b_fp4_flux2.safetensors",
             "gb": 3.85,
-            "note": "runs without Blackwell, but ~2x slower outside it"
+            "note": "runs without Blackwell, but ~2x slower outside it",
+            "official": true
           }
         ]
       },
@@ -297,7 +327,8 @@
             "label": "default",
             "repo": "Comfy-Org/flux2-dev",
             "file": "split_files/vae/flux2-vae.safetensors",
-            "gb": 0.34
+            "gb": 0.34,
+            "official": true
           }
         ]
       }
@@ -315,7 +346,8 @@
             "repo": "Comfy-Org/Krea-2",
             "file": "diffusion_models/krea2_turbo_bf16.safetensors",
             "gb": 24.48,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "GGUF Q8_0",
@@ -323,28 +355,32 @@
             "file": "krea2_turbo-Q8_0.gguf",
             "gb": 12.76,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "mxfp8",
             "repo": "Comfy-Org/Krea-2",
             "file": "diffusion_models/krea2_turbo_mxfp8.safetensors",
             "gb": 12.6,
-            "note": "requires Blackwell (sm_100+)"
+            "note": "requires Blackwell (sm_100+)",
+            "official": true
           },
           {
             "label": "int8",
             "repo": "Comfy-Org/Krea-2",
             "file": "diffusion_models/krea2_turbo_int8_convrot.safetensors",
             "gb": 12.57,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "fp8",
             "repo": "Comfy-Org/Krea-2",
             "file": "diffusion_models/krea2_turbo_fp8_scaled.safetensors",
             "gb": 12.24,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           },
           {
             "label": "GGUF Q6_K",
@@ -352,7 +388,8 @@
             "file": "krea2_turbo-Q6_K.gguf",
             "gb": 9.86,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "GGUF Q5_K_M",
@@ -360,14 +397,16 @@
             "file": "krea2_turbo-Q5_K_M.gguf",
             "gb": 8.26,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "nvfp4",
             "repo": "Comfy-Org/Krea-2",
             "file": "diffusion_models/krea2_turbo_nvfp4.safetensors",
             "gb": 7.15,
-            "note": "runs without Blackwell, but ~2x slower outside it"
+            "note": "runs without Blackwell, but ~2x slower outside it",
+            "official": true
           },
           {
             "label": "GGUF Q4_K_M",
@@ -375,7 +414,8 @@
             "file": "krea2_turbo-Q4_K_M.gguf",
             "gb": 6.97,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "GGUF Q3_K_M",
@@ -383,7 +423,8 @@
             "file": "krea2_turbo-Q3_K_M.gguf",
             "gb": 5.6,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "GGUF Q2_K",
@@ -391,7 +432,8 @@
             "file": "krea2_turbo-Q2_K.gguf",
             "gb": 4.55,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           }
         ]
       },
@@ -403,14 +445,16 @@
             "repo": "Comfy-Org/Krea-2",
             "file": "text_encoders/qwen3vl_4b_bf16.safetensors",
             "gb": 8.27,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "fp8",
             "repo": "Comfy-Org/Krea-2",
             "file": "text_encoders/qwen3vl_4b_fp8_scaled.safetensors",
             "gb": 4.88,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -421,7 +465,8 @@
             "label": "default",
             "repo": "Comfy-Org/Krea-2",
             "file": "vae/qwen_image_vae.safetensors",
-            "gb": 0.24
+            "gb": 0.24,
+            "official": true
           }
         ]
       },
@@ -434,7 +479,8 @@
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_turbo_lora_rank_64_bf16.safetensors",
             "gb": 0.44,
-            "note": "the Turbo checkpoint is already distilled; this is for the RAW one"
+            "note": "the Turbo checkpoint is already distilled; this is for the RAW one",
+            "official": true
           }
         ]
       },
@@ -445,13 +491,15 @@
             "label": "Realism Engine v3.1",
             "repo": "uzumix/Realism_Engine_Ideogram_4_Krea_2_v3.1",
             "file": "realism_engine_krea2_v3.1.safetensors",
-            "gb": 1.46
+            "gb": 1.46,
+            "official": false
           },
           {
             "label": "Realism Engine v2",
             "repo": "uzumix/realism_engine_krea2_v2",
             "file": "realism_engine_krea2_v2.safetensors",
-            "gb": 1.46
+            "gb": 1.46,
+            "official": false
           }
         ],
         "optional": true
@@ -463,61 +511,71 @@
             "label": "style reference",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_style_reference.safetensors",
-            "gb": 0.43
+            "gb": 0.43,
+            "official": true
           },
           {
             "label": "darkbrush",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_darkbrush.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           },
           {
             "label": "dotmatrix",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_dotmatrix.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           },
           {
             "label": "kidsdrawing",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_kidsdrawing.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           },
           {
             "label": "neondrip",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_neondrip.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           },
           {
             "label": "rainywindow",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_rainywindow.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           },
           {
             "label": "retroanime",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_retroanime.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           },
           {
             "label": "softwatercolor",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_softwatercolor.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           },
           {
             "label": "sunsetblur",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_sunsetblur.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           },
           {
             "label": "vintagetarot",
             "repo": "Comfy-Org/Krea-2",
             "file": "loras/krea2_vintagetarot.safetensors",
-            "gb": 0.44
+            "gb": 0.44,
+            "official": true
           }
         ],
         "optional": true,
@@ -537,7 +595,8 @@
             "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
             "file": "split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors",
             "gb": 38.06,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "GGUF Q8_0",
@@ -545,21 +604,24 @@
             "file": "qwen-image-edit-2511-Q8_0.gguf",
             "gb": 20.27,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "fp8mixed",
             "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
             "file": "split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors",
             "gb": 19.12,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           },
           {
             "label": "int8 (pre-Ada GPUs)",
             "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
             "file": "split_files/diffusion_models/qwen_image_edit_2511_int8_convrot.safetensors",
             "gb": 19.09,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "GGUF Q4_K_M",
@@ -567,7 +629,8 @@
             "file": "qwen-image-edit-2511-Q4_K_M.gguf",
             "gb": 12.34,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           }
         ]
       },
@@ -578,21 +641,24 @@
             "label": "full",
             "repo": "Comfy-Org/Qwen-Image_ComfyUI",
             "file": "split_files/text_encoders/qwen_2.5_vl_7b.safetensors",
-            "gb": 15.45
+            "gb": 15.45,
+            "official": true
           },
           {
             "label": "fp8_scaled",
             "repo": "Comfy-Org/Qwen-Image_ComfyUI",
             "file": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
             "gb": 8.74,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           },
           {
             "label": "nvfp4",
             "repo": "Comfy-Org/Qwen-Image_ComfyUI",
             "file": "split_files/text_encoders/qwen_2.5_vl_7b_nvfp4.safetensors",
             "gb": 5.69,
-            "note": "runs without Blackwell, but ~2x slower outside it"
+            "note": "runs without Blackwell, but ~2x slower outside it",
+            "official": true
           }
         ]
       },
@@ -603,7 +669,8 @@
             "label": "default",
             "repo": "Comfy-Org/Qwen-Image_ComfyUI",
             "file": "split_files/vae/qwen_image_vae.safetensors",
-            "gb": 0.24
+            "gb": 0.24,
+            "official": true
           }
         ]
       },
@@ -614,13 +681,15 @@
             "label": "4-steps (template toggle, off by default)",
             "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
             "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
-            "gb": 0.79
+            "gb": 0.79,
+            "official": false
           },
           {
             "label": "8-steps (better fast mode)",
             "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
             "file": "Qwen-Image-Edit-2511-Lightning-8steps-V1.0-bf16.safetensors",
-            "gb": 0.79
+            "gb": 0.79,
+            "official": false
           }
         ]
       }
@@ -638,28 +707,32 @@
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "diffusion_models/wan_animate_2_bf16.safetensors",
             "gb": 30.54,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "int8",
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "diffusion_models/wan_animate_2_int8_convrot.safetensors",
             "gb": 15.51,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "distill bf16",
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "diffusion_models/wan_animate_2_distill_bf16.safetensors",
             "gb": 30.54,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "distill int8 convrot",
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "diffusion_models/wan_animate_2_distill_int8_convrot.safetensors",
             "gb": 15.51,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           }
         ]
       },
@@ -671,14 +744,16 @@
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "text_encoders/umt5_xxl_fp16.safetensors",
             "gb": 10.59,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "fp8",
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
             "gb": 6.27,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -689,7 +764,8 @@
             "label": "default",
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "clip_vision/clip_vision_h.safetensors",
-            "gb": 1.18
+            "gb": 1.18,
+            "official": true
           }
         ]
       },
@@ -700,7 +776,8 @@
             "label": "Wan 2.1",
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "vae/Wan2_1_VAE_bf16.safetensors",
-            "gb": 0.24
+            "gb": 0.24,
+            "official": true
           }
         ]
       },
@@ -711,7 +788,8 @@
             "label": "lightx2v (makes base run at 6 steps)",
             "repo": "Comfy-Org/Wan-Animate-2",
             "file": "loras/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
-            "gb": 0.69
+            "gb": 0.69,
+            "official": true
           }
         ]
       }
@@ -729,35 +807,100 @@
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_bf16.safetensors",
             "gb": 61.73,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "pruned bf16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_pruned_bf16.safetensors",
             "gb": 37.46,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "int8 full",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors",
             "gb": 31.7,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "pruned fp8",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors",
             "gb": 19.52,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           },
           {
             "label": "pruned int8",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
             "gb": 19.53,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
+          },
+          {
+            "label": "w4a8 mixed (pruned)",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "minimax_h3_fl2va_pruned_w4a8_mixed.safetensors",
+            "gb": 11.68,
+            "official": false,
+            "note": "community (Kijai): the smallest one; experimental"
+          },
+          {
+            "label": "nvfp4 (pruned)",
+            "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
+            "file": "MiniMax_H3_FL2VA_pruned_nvfp4.safetensors",
+            "gb": 11.67,
+            "note": "community (Abiray): not published by Comfy-Org. Faster on Blackwell",
+            "official": false
+          },
+          {
+            "label": "int4/int8 mixed (pruned)",
+            "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
+            "file": "MiniMax_H3_FL2VA_pruned_mixed_int4_int8_convrot.safetensors",
+            "gb": 14.81,
+            "note": "community (Abiray); requires torch cu130",
+            "official": false
+          },
+          {
+            "label": "GGUF Q8_0 (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-FL2VA-Pruned-Q8_0.gguf",
+            "gb": 20.1,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "GGUF Q6_K (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-FL2VA-Pruned-Q6_K.gguf",
+            "gb": 15.58,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "GGUF Q5_K_M (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-FL2VA-Pruned-Q5_K_M.gguf",
+            "gb": 13.1,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "GGUF Q4_K_M (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-FL2VA-Pruned-Q4_K_M.gguf",
+            "gb": 10.77,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
           }
         ]
       },
@@ -769,21 +912,24 @@
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors",
             "gb": 47.97,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "int8",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
             "gb": 25.28,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "nvfp4_awq",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
             "gb": 14.61,
-            "note": "runs without Blackwell, but ~2x slower outside it"
+            "note": "runs without Blackwell, but ~2x slower outside it",
+            "official": true
           }
         ]
       },
@@ -794,7 +940,16 @@
             "label": "fp16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "vae/minimax_h3_video_vae_fp16.safetensors",
-            "gb": 4.85
+            "gb": 4.85,
+            "official": true
+          },
+          {
+            "label": "int8 convrot",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "minimax_h3_video_vae_int8_convrot.safetensors",
+            "gb": 2.95,
+            "official": false,
+            "note": "community (Kijai); requires torch cu130"
           }
         ]
       },
@@ -805,7 +960,8 @@
             "label": "fp32",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
-            "gb": 0.56
+            "gb": 0.56,
+            "official": true
           }
         ]
       },
@@ -816,13 +972,75 @@
             "label": "8-step (template)",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
-            "gb": 1.82
+            "gb": 1.82,
+            "official": true
           },
           {
             "label": "4-step 768p",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_fl2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors",
-            "gb": 1.82
+            "gb": 1.82,
+            "official": true
+          },
+          {
+            "label": "8-step resized (rank 24)",
+            "repo": "Kijai/MiniMax-H3_comfy",
+            "file": "loras/minimax_h3_fl2v_lightx2v_turbo_8step_v1.0_resized_avg_rank_24_bf16.safetensors",
+            "gb": 0.34,
+            "official": false,
+            "note": "community (Kijai): same LoRA resized to a lower rank — 6x lighter"
+          },
+          {
+            "label": "4-step 768p resized (rank 31)",
+            "repo": "Kijai/MiniMax-H3_comfy",
+            "file": "loras/minimax_h3_fl2v_lightx2v_turbo_4step_v1.0_768p_resized_avg_rank_31_bf16.safetensors",
+            "gb": 0.41,
+            "official": false,
+            "note": "community (Kijai): same LoRA resized to a lower rank — 6x lighter"
+          },
+          {
+            "label": "4-step v1.1 768p resized (rank 64)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_fl2v_turbo_4step_v1.1_768p_comfyui_resized_avg_rank_64_bf16.safetensors",
+            "gb": 0.87,
+            "note": "community (drbaph): v1.1, newer than the official v1.0",
+            "official": false
+          },
+          {
+            "label": "4-step (larryvrh, most adopted)",
+            "repo": "larryvrh/MiniMax-H3-Turbo-Lora",
+            "file": "minimax_h3_turbo_4step.safetensors",
+            "gb": 0.73,
+            "note": "community (larryvrh): 846 likes, 606k dl/30d",
+            "official": false
+          }
+        ]
+      },
+      "preview vae": {
+        "folder": "vae_approx",
+        "optional": true,
+        "options": [
+          {
+            "label": "taeh3 (fast previews)",
+            "repo": "Kijai/MiniMax-H3-TAE",
+            "file": "vae_approx/taeh3.safetensors",
+            "gb": 0.01,
+            "official": false,
+            "note": "community (Kijai): non-pixelated previews while sampling"
+          }
+        ]
+      },
+      "realism lora": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "Realism People (fal)",
+            "repo": "fal/MiniMax-H3-Realism-People-LoRA",
+            "file": "h3-realism-people-t2v-i2v-r2v.safetensors",
+            "gb": 0.12,
+            "note": "community (fal): works on t2v, i2v and r2v",
+            "official": false
           }
         ]
       }
@@ -840,35 +1058,100 @@
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_bf16.safetensors",
             "gb": 61.73,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "pruned bf16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_pruned_bf16.safetensors",
             "gb": 37.46,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "int8 full",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors",
             "gb": 31.7,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "pruned fp8",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
             "gb": 19.52,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           },
           {
             "label": "pruned int8",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
             "gb": 19.53,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
+          },
+          {
+            "label": "w4a8 mixed (pruned)",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "minimax_h3_ref2va_pruned_w4a8_mixed.safetensors",
+            "gb": 10.96,
+            "official": false,
+            "note": "community (Kijai): the smallest one; experimental"
+          },
+          {
+            "label": "nvfp4 (pruned)",
+            "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
+            "file": "MiniMax_H3_Ref2VA_pruned_nvfp4.safetensors",
+            "gb": 11.67,
+            "note": "community (Abiray): not published by Comfy-Org. Faster on Blackwell",
+            "official": false
+          },
+          {
+            "label": "int4/int8 mixed (pruned)",
+            "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
+            "file": "MiniMax_H3_Ref2VA_pruned_mixed_int4_int8_convrot.safetensors",
+            "gb": 14.06,
+            "note": "community (Abiray); requires torch cu130",
+            "official": false
+          },
+          {
+            "label": "GGUF Q8_0 (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-Ref2VA-Pruned-Q8_0.gguf",
+            "gb": 20.1,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "GGUF Q6_K (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-Ref2VA-Pruned-Q6_K.gguf",
+            "gb": 15.58,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "GGUF Q5_K_M (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-Ref2VA-Pruned-Q5_K_M.gguf",
+            "gb": 13.1,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
+          },
+          {
+            "label": "GGUF Q4_K_M (pruned)",
+            "repo": "Abiray/MiniMax-H3-Pruned-GGUF",
+            "file": "MiniMax-H3-Ref2VA-Pruned-Q4_K_M.gguf",
+            "gb": 10.77,
+            "folder": "unet",
+            "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
+            "official": false
           }
         ]
       },
@@ -880,21 +1163,24 @@
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors",
             "gb": 47.97,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "int8",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
             "gb": 25.28,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "nvfp4_awq",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
             "gb": 14.61,
-            "note": "runs without Blackwell, but ~2x slower outside it"
+            "note": "runs without Blackwell, but ~2x slower outside it",
+            "official": true
           }
         ]
       },
@@ -905,7 +1191,16 @@
             "label": "fp16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "vae/minimax_h3_video_vae_fp16.safetensors",
-            "gb": 4.85
+            "gb": 4.85,
+            "official": true
+          },
+          {
+            "label": "int8 convrot",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "minimax_h3_video_vae_int8_convrot.safetensors",
+            "gb": 2.95,
+            "official": false,
+            "note": "community (Kijai); requires torch cu130"
           }
         ]
       },
@@ -916,7 +1211,8 @@
             "label": "fp32",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
-            "gb": 0.56
+            "gb": 0.56,
+            "official": true
           }
         ]
       },
@@ -927,7 +1223,44 @@
             "label": "ref2v 4-step v0.1 (template; early)",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
-            "gb": 1.82
+            "gb": 1.82,
+            "official": true
+          },
+          {
+            "label": "ref2v 4-step resized (rank 20)",
+            "repo": "Kijai/MiniMax-H3_comfy",
+            "file": "loras/minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors",
+            "gb": 0.29,
+            "official": false,
+            "note": "community (Kijai) resized. ⚠️ the ref2v turbo breaks identity reference"
+          }
+        ]
+      },
+      "preview vae": {
+        "folder": "vae_approx",
+        "optional": true,
+        "options": [
+          {
+            "label": "taeh3 (fast previews)",
+            "repo": "Kijai/MiniMax-H3-TAE",
+            "file": "vae_approx/taeh3.safetensors",
+            "gb": 0.01,
+            "official": false,
+            "note": "community (Kijai): non-pixelated previews while sampling"
+          }
+        ]
+      },
+      "realism lora": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "Realism People (fal)",
+            "repo": "fal/MiniMax-H3-Realism-People-LoRA",
+            "file": "h3-realism-people-t2v-i2v-r2v.safetensors",
+            "gb": 0.12,
+            "note": "community (fal): works on t2v, i2v and r2v",
+            "official": false
           }
         ]
       }
@@ -945,22 +1278,25 @@
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors",
             "gb": 26.62,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "GGUF Q8_0",
             "repo": "QuantStack/Wan2.2-I2V-A14B-GGUF",
             "file": "HighNoise/Wan2.2-I2V-A14B-HighNoise-Q8_0.gguf",
-            "gb": 15.0,
+            "gb": 14.35,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "fp8_scaled",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
             "gb": 13.31,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -972,22 +1308,25 @@
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors",
             "gb": 26.62,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "GGUF Q8_0",
             "repo": "QuantStack/Wan2.2-I2V-A14B-GGUF",
             "file": "LowNoise/Wan2.2-I2V-A14B-LowNoise-Q8_0.gguf",
-            "gb": 15.0,
+            "gb": 14.35,
             "note": "requires the ComfyUI-GGUF nodepack (city96); the route for low-VRAM GPUs",
-            "folder": "unet"
+            "folder": "unet",
+            "official": false
           },
           {
             "label": "fp8_scaled",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
             "gb": 13.31,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -999,14 +1338,16 @@
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
             "gb": 10.59,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "fp8_scaled",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
             "gb": 6.27,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -1017,7 +1358,8 @@
             "label": "Wan 2.1 (for all 14B)",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/vae/wan_2.1_vae.safetensors",
-            "gb": 0.24
+            "gb": 0.24,
+            "official": true
           }
         ]
       },
@@ -1028,19 +1370,22 @@
             "label": "lightx2v 260412 rank256 (newest, 720p-trained)",
             "repo": "Kijai/WanVideo_comfy",
             "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_256_fp16.safetensors",
-            "gb": 2.33
+            "gb": 2.33,
+            "official": false
           },
           {
             "label": "lightx2v 260412 rank64",
             "repo": "Kijai/WanVideo_comfy",
             "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors",
-            "gb": 0.59
+            "gb": 0.59,
+            "official": false
           },
           {
             "label": "lightx2v v1 (old, in official template)",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
-            "gb": 1.14
+            "gb": 1.14,
+            "official": true
           }
         ],
         "multi": true,
@@ -1053,19 +1398,22 @@
             "label": "lightx2v 260412 rank256 (newest, 720p-trained)",
             "repo": "Kijai/WanVideo_comfy",
             "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_256_fp16.safetensors",
-            "gb": 2.33
+            "gb": 2.33,
+            "official": false
           },
           {
             "label": "lightx2v 260412 rank64",
             "repo": "Kijai/WanVideo_comfy",
             "file": "LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors",
-            "gb": 0.59
+            "gb": 0.59,
+            "official": false
           },
           {
             "label": "lightx2v v1 (old, in official template)",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
-            "gb": 1.14
+            "gb": 1.14,
+            "official": true
           }
         ],
         "multi": true,
@@ -1085,14 +1433,16 @@
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp16.safetensors",
             "gb": 26.61,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "fp8_scaled",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
             "gb": 13.31,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -1104,14 +1454,16 @@
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp16.safetensors",
             "gb": 26.61,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "fp8_scaled",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
             "gb": 13.31,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -1123,14 +1475,16 @@
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
             "gb": 10.59,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "fp8_scaled",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
             "gb": 6.27,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere"
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
           }
         ]
       },
@@ -1141,7 +1495,8 @@
             "label": "Wan 2.1 (for all 14B)",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/vae/wan_2.1_vae.safetensors",
-            "gb": 0.24
+            "gb": 0.24,
+            "official": true
           }
         ]
       },
@@ -1153,13 +1508,15 @@
             "repo": "lightx2v/Wan2.2-Lightning",
             "file": "Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V2.0/high_noise_model.safetensors",
             "as": "Wan_2_2_T2V_A14B_HIGH_lightning_4step_lora_seko_v2.0_rank_64.safetensors",
-            "gb": 1.14
+            "gb": 1.14,
+            "official": false
           },
           {
             "label": "lightx2v v1.1 (in official template)",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors",
-            "gb": 1.14
+            "gb": 1.14,
+            "official": true
           }
         ]
       },
@@ -1171,13 +1528,15 @@
             "repo": "lightx2v/Wan2.2-Lightning",
             "file": "Wan2.2-T2V-A14B-4steps-lora-rank64-Seko-V2.0/low_noise_model.safetensors",
             "as": "Wan_2_2_T2V_A14B_LOW_lightning_4step_lora_seko_v2.0_rank_64.safetensors",
-            "gb": 1.14
+            "gb": 1.14,
+            "official": false
           },
           {
             "label": "lightx2v v1.1 (in official template)",
             "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
             "file": "split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors",
-            "gb": 1.14
+            "gb": 1.14,
+            "official": true
           }
         ]
       }
@@ -1195,35 +1554,40 @@
             "repo": "Lightricks/LTX-2.5",
             "file": "diffusion_models/ltx-2.5-22b-dev-transformer-bf16.safetensors",
             "gb": 39.13,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "dev int8",
             "repo": "Lightricks/LTX-2.5",
             "file": "diffusion_models/ltx-2.5-22b-dev-transformer-comfy-int8-convrot.safetensors",
             "gb": 20.03,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "distilled bf16",
             "repo": "Lightricks/LTX-2.5",
             "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-bf16.safetensors",
             "gb": 39.13,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "distilled int8",
             "repo": "Lightricks/LTX-2.5",
             "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
             "gb": 20.03,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           },
           {
             "label": "distilled nvfp4",
             "repo": "Lightricks/LTX-2.5",
             "file": "diffusion_models/ltx-2.5-22b-distilled-transformer-nvfp4.safetensors",
             "gb": 17.44,
-            "note": "runs without Blackwell, but ~2x slower outside it"
+            "note": "runs without Blackwell, but ~2x slower outside it",
+            "official": true
           }
         ]
       },
@@ -1235,14 +1599,16 @@
             "repo": "Lightricks/LTX-2.5",
             "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-bf16.safetensors",
             "gb": 24.46,
-            "note": "no special requirements; highest VRAM"
+            "note": "no special requirements; highest VRAM",
+            "official": true
           },
           {
             "label": "int8",
             "repo": "Lightricks/LTX-2.5",
             "file": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
             "gb": 14.32,
-            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them"
+            "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
+            "official": true
           }
         ]
       },
@@ -1253,7 +1619,8 @@
             "label": "default",
             "repo": "Lightricks/LTX-2.5",
             "file": "vae/ltx-2.5-video-vae-bf16.safetensors",
-            "gb": 1.37
+            "gb": 1.37,
+            "official": true
           }
         ]
       },
@@ -1264,7 +1631,8 @@
             "label": "default",
             "repo": "Lightricks/LTX-2.5",
             "file": "vae/ltx-2.5-audio-vae-bf16.safetensors",
-            "gb": 0.34
+            "gb": 0.34,
+            "official": true
           }
         ]
       },
@@ -1275,7 +1643,8 @@
             "label": "default",
             "repo": "Lightricks/LTX-2.5",
             "file": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
-            "gb": 0.93
+            "gb": 0.93,
+            "official": true
           }
         ]
       },
@@ -1286,7 +1655,8 @@
             "label": "gemma4 e2b",
             "repo": "Comfy-Org/gemma-4",
             "file": "text_encoders/gemma4_e2b_it_bf16.safetensors",
-            "gb": 9.57
+            "gb": 9.57,
+            "official": true
           }
         ]
       }

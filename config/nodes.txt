@@ -48,5 +48,6 @@ https://github.com/crystian/ComfyUI-Crystools.git
 
 # https://github.com/kijai/ComfyUI-Florence2.git                 # 4 — QwenVL lo reemplazó
 https://github.com/city96/ComfyUI-GGUF.git                       # carga los .gguf (preset > gguf)
+https://github.com/AIMixer/ComfyUI_MiniMaxH3_Director.git        # H3: timeline multi-segmento + v2v/rv2v (811*)
 # https://github.com/chrisgoringe/cg-use-everywhere.git          # 6
 # https://github.com/alexopus/ComfyUI-Image-Saver.git            # 7
