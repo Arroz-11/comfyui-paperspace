@@ -976,6 +976,18 @@
             "official": true
           },
           {
+            "label": "8-step 768p v1.0 (27-ago, mejor audio segun autor)",
+            "repo": "lightx2v/Minimax-h3-Turbo",
+            "file": "minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+            "gb": 1.82
+          },
+          {
+            "label": "4-step v1.1 768p (full)",
+            "repo": "lightx2v/Minimax-h3-Turbo",
+            "file": "minimax_h3_fl2v_turbo_4step_v1.1_768p_comfyui_bf16.safetensors",
+            "gb": 1.82
+          },
+          {
             "label": "4-step 768p",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_fl2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors",
@@ -1055,6 +1067,71 @@
             "gb": 2.4,
             "official": false,
             "note": "community (Kijai): pulls the character closer to the reference photo. Do NOT stack layers 0-25"
+          }
+        ]
+      },
+      "effect embeddings": {
+        "folder": "embeddings",
+        "options": [
+          {
+            "label": "kiss_camera",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_kiss_camera.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "bullet_time",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_bullet_time.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "truman_show",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_truman_show.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "fire_breath",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_fire_breath.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "dark_magic",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_dark_magic.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "spiral_ascent",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_spiral_ascent.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "storm_magic",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_storm_magic.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "blooming_flowers",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_blooming_flowers.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "four_seasons",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_four_seasons.safetensors",
+            "gb": 0.001
+          },
+          {
+            "label": "art_is_explosion",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "embeddings/minimaxh3_art_is_explosion.safetensors",
+            "gb": 0.0
           }
         ]
       }
