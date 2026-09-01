@@ -580,6 +580,34 @@
         ],
         "optional": true,
         "multi": true
+      },
+      "speed lora": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "4-step distill",
+            "repo": "lvladikov/Krea2-Turbo-Distill-4step-LoRA",
+            "file": "krea2_turbo_4step_rank_64_lora_latest_comfyui.safetensors",
+            "gb": 0.41,
+            "note": "drops Turbo from 8 to 4 steps (~1.6x end to end); keep cfg 1, euler, simple, lora 1.0",
+            "official": false
+          }
+        ]
+      },
+      "pose controlnet": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "OpenPose (Turbo)",
+            "repo": "thedeoxen/Krea-2-pose-controlnet",
+            "file": "krea2_turbo_openpose_controlnet.safetensors",
+            "gb": 0.21,
+            "note": "pose map goes in as image 1 of the ostris-edit encoder; needs comfyui_controlnet_aux for DWPose; weight 0.8-1.0",
+            "official": false
+          }
+        ]
       }
     }
   },
