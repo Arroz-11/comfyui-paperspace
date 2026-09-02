@@ -1021,27 +1021,30 @@
             "label": "8-step 768p v1.0 (27-ago, mejor audio segun autor)",
             "repo": "lightx2v/Minimax-h3-Turbo",
             "file": "minimax_h3_fl2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
-            "gb": 1.82
+            "gb": 1.82,
+            "note": "author's training shift: video 6 / audio 3 (not core's 12/3)."
           },
           {
             "label": "4-step v1.1 768p (full)",
             "repo": "lightx2v/Minimax-h3-Turbo",
             "file": "minimax_h3_fl2v_turbo_4step_v1.1_768p_comfyui_bf16.safetensors",
-            "gb": 1.82
+            "gb": 1.82,
+            "note": "author's training shift: video 6 / audio 3 (not core's 12/3)."
           },
           {
             "label": "4-step 768p",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_fl2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors",
             "gb": 1.82,
-            "official": true
+            "official": true,
+            "note": "author's training shift: video 6 / audio 3 (not core's 12/3)."
           },
           {
             "label": "4-step v1.1 768p resized (rank 64)",
             "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
             "file": "minimax_h3_fl2v_turbo_4step_v1.1_768p_comfyui_resized_avg_rank_64_bf16.safetensors",
             "gb": 0.87,
-            "note": "community (drbaph): v1.1, newer than the official v1.0",
+            "note": "author's training shift: video 6 / audio 3 (not core's 12/3). community (drbaph): v1.1, newer than the official v1.0",
             "official": false
           },
           {
@@ -1058,7 +1061,7 @@
             "file": "loras/minimax_h3_fl2v_lightx2v_turbo_4step_v1.0_768p_resized_avg_rank_31_bf16.safetensors",
             "gb": 0.41,
             "official": false,
-            "note": "community (Kijai): 6x lighter BUT measured to degrade — breaks camera motion and ignores the prompt in i2v"
+            "note": "author's training shift: video 6 / audio 3 (not core's 12/3). community (Kijai): 6x lighter BUT measured to degrade — breaks camera motion and ignores the prompt in i2v"
           },
           {
             "label": "4-step (larryvrh, most adopted)",
@@ -1174,6 +1177,50 @@
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "embeddings/minimaxh3_art_is_explosion.safetensors",
             "gb": 0.0
+          }
+        ]
+      },
+      "fun controlnet": {
+        "folder": "model_patches",
+        "optional": true,
+        "options": [
+          {
+            "label": "Union pruned bf16",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "controlnet/minimax_h3_fun_controlnet_union_pruned_bf16.safetensors",
+            "gb": 3.93,
+            "note": "pose/depth/canny/HED/MLSD; core support since 31-aug (master); load with ModelPatchLoader -> Apply MiniMax H3 Fun ControlNet",
+            "official": false
+          },
+          {
+            "label": "Union pruned int8",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "controlnet/minimax_h3_fun_controlnet_union_pruned_int8_convrot.safetensors",
+            "gb": 2.14,
+            "note": "same, int8 convrot (needs cu130 kernels like the int8 DiT)",
+            "official": false
+          }
+        ]
+      },
+      "acc lora (PDD)": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "Acc 8-step pruned (FL2VA)",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "loras/MiniMax-H3-FL2VA-Acc-8Step_pruned_comfy.safetensors",
+            "gb": 1.61,
+            "note": "alibaba-pai PDD, core support since 28-aug (master). Community verdict: limbs smear in fast motion (2 users w/ video); lightx2v turbo preferred",
+            "official": false
+          },
+          {
+            "label": "Acc 8-step full (FL2VA)",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "loras/MiniMax-H3-FL2VA-Acc-8Step_comfy.safetensors",
+            "gb": 1.61,
+            "note": "same, for the unpruned DiT",
+            "official": false
           }
         ]
       }
@@ -1408,6 +1455,50 @@
             "gb": 2.4,
             "official": false,
             "note": "community (Kijai): pulls the character closer to the reference photo. Do NOT stack layers 0-25"
+          }
+        ]
+      },
+      "fun controlnet": {
+        "folder": "model_patches",
+        "optional": true,
+        "options": [
+          {
+            "label": "Union pruned bf16",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "controlnet/minimax_h3_fun_controlnet_union_pruned_bf16.safetensors",
+            "gb": 3.93,
+            "note": "pose/depth/canny/HED/MLSD; core support since 31-aug (master); load with ModelPatchLoader -> Apply MiniMax H3 Fun ControlNet",
+            "official": false
+          },
+          {
+            "label": "Union pruned int8",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "controlnet/minimax_h3_fun_controlnet_union_pruned_int8_convrot.safetensors",
+            "gb": 2.14,
+            "note": "same, int8 convrot (needs cu130 kernels like the int8 DiT)",
+            "official": false
+          }
+        ]
+      },
+      "acc lora (PDD)": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "Acc 8-step pruned (Ref2VA)",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "loras/MiniMax-H3-Ref2VA-Acc-8Step_pruned_comfy.safetensors",
+            "gb": 1.61,
+            "note": "alibaba-pai PDD, core support since 28-aug (master). Community verdict: limbs smear in fast motion (2 users w/ video); lightx2v turbo preferred",
+            "official": false
+          },
+          {
+            "label": "Acc 8-step full (Ref2VA)",
+            "repo": "Kijai/MiniMax-H3-experimental",
+            "file": "loras/MiniMax-H3-Ref2VA-Acc-8Step_comfy.safetensors",
+            "gb": 1.61,
+            "note": "same, for the unpruned DiT",
+            "official": false
           }
         ]
       }
