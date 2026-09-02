@@ -720,6 +720,20 @@
             "official": false
           }
         ]
+      },
+      "angles lora": {
+        "folder": "loras",
+        "optional": true,
+        "options": [
+          {
+            "label": "Multiple-Angles 2511",
+            "repo": "fal/Qwen-Image-Edit-2511-Multiple-Angles-LoRA",
+            "file": "qwen-image-edit-2511-multiple-angles-lora.safetensors",
+            "gb": 0.28,
+            "note": "96 camera poses, native 2511. prompt: <sks> [azimuth] [elevation] [distance]; strength 0.8-1.0",
+            "official": false
+          }
+        ]
       }
     }
   },
