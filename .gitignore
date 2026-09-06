@@ -10,3 +10,4 @@ logs/
 # Local working notes (never in the public repo)
 MIS-PASOS.md
 __pycache__/
+config/presets.local.json.bak-*
