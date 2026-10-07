@@ -839,16 +839,24 @@
   },
   "minimax-h3": {
     "name": "MiniMax H3 (FL2VA)",
-    "about": "Video + native audio, 33B — t2v / i2v / first-last frame. int8_convrot needs torch cu130. RAM-heavy on first load",
+    "about": "Video + native stereo audio. FL2VA: t2v/i2v/first-last frames. Choose components individually. FP8 fallback for cu128; INT8 prefers torch cu130 + compatible kernels. Turbo is optional.",
     "components": {
       "diffusion": {
         "folder": "diffusion_models",
         "options": [
           {
+            "label": "pruned fp8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors",
+            "gb": 19.519,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
+          },
+          {
             "label": "bf16 (full)",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_bf16.safetensors",
-            "gb": 61.73,
+            "gb": 61.729,
             "note": "no special requirements; highest VRAM",
             "official": true
           },
@@ -856,7 +864,7 @@
             "label": "int8 full",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors",
-            "gb": 31.7,
+            "gb": 31.701,
             "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
             "official": true
           },
@@ -864,7 +872,7 @@
             "label": "pruned bf16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_fl2va_pruned_bf16.safetensors",
-            "gb": 37.46,
+            "gb": 37.463,
             "note": "no special requirements; highest VRAM",
             "official": true
           },
@@ -883,14 +891,6 @@
             "file": "diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
             "gb": 19.53,
             "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
-            "official": true
-          },
-          {
-            "label": "pruned fp8",
-            "repo": "Comfy-Org/MiniMax-H3",
-            "file": "diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors",
-            "gb": 19.52,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
             "official": true
           },
           {
@@ -925,14 +925,14 @@
             "file": "minimax_h3_fl2va_pruned_w4a8_mixed.safetensors",
             "gb": 11.68,
             "official": false,
-            "note": "community (Kijai): smallest, but MEASURED 3x SLOWER than int8 (146 vs 53 s/step). Open issue"
+            "note": "Community experimental quant; speed/quality depend on backend. Historical benchmarks are not a guarantee."
           },
           {
             "label": "nvfp4 (pruned)",
             "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
             "file": "MiniMax_H3_FL2VA_pruned_nvfp4.safetensors",
             "gb": 11.67,
-            "note": "community (Abiray): not published by Comfy-Org. Faster on Blackwell",
+            "note": "Community diffusion NVFP4 build: verify Blackwell-only requirements for this exact file; not the NVFP4 AWQ text encoder.",
             "official": false
           },
           {
@@ -943,6 +943,14 @@
             "folder": "unet",
             "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
             "official": false
+          },
+          {
+            "label": "pruned w6a8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_fl2va_pruned_w6a8.safetensors",
+            "gb": 14.886,
+            "note": "6-bit weights / INT8 activations; needs current H3 loader and compatible convrot kernels. Disk size is not peak VRAM.",
+            "official": true
           }
         ]
       },
@@ -950,10 +958,18 @@
         "folder": "text_encoders",
         "options": [
           {
+            "label": "nvfp4_awq",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+            "gb": 14.61,
+            "note": "Official quant; does not require Blackwell. Encoding performance depends on GPU/backend.",
+            "official": true
+          },
+          {
             "label": "bf16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors",
-            "gb": 47.97,
+            "gb": 47.969,
             "note": "no special requirements; highest VRAM",
             "official": true
           },
@@ -961,16 +977,8 @@
             "label": "int8",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
-            "gb": 25.28,
+            "gb": 25.277,
             "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
-            "official": true
-          },
-          {
-            "label": "nvfp4_awq",
-            "repo": "Comfy-Org/MiniMax-H3",
-            "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
-            "gb": 14.61,
-            "note": "runs without Blackwell, but ~2x slower outside it",
             "official": true
           }
         ]
@@ -987,11 +995,11 @@
           },
           {
             "label": "int8 convrot",
-            "repo": "Kijai/MiniMax-H3-experimental",
-            "file": "minimax_h3_video_vae_int8_convrot.safetensors",
-            "gb": 2.95,
-            "official": false,
-            "note": "community (Kijai): 2x faster DECODE only (19.5s -> 10.0s), quality loss invisible. Does not affect sampling"
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "vae/minimax_h3_video_vae_int8_convrot.safetensors",
+            "gb": 2.618,
+            "official": true,
+            "note": "Official INT8 video VAE; verify core/kernel compatibility. Existing same-name files are skipped, not overwritten."
           }
         ]
       },
@@ -1002,7 +1010,7 @@
             "label": "fp32",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
-            "gb": 0.56,
+            "gb": 0.564,
             "official": true
           }
         ]
@@ -1014,7 +1022,7 @@
             "label": "8-step (template)",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
-            "gb": 1.82,
+            "gb": 1.822,
             "official": true
           },
           {
@@ -1035,7 +1043,7 @@
             "label": "4-step 768p",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_fl2v_turbo_4step_v1.0_768p_comfyui_bf16.safetensors",
-            "gb": 1.82,
+            "gb": 1.822,
             "official": true,
             "note": "author's training shift: video 6 / audio 3 (not core's 12/3)."
           },
@@ -1044,7 +1052,7 @@
             "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
             "file": "minimax_h3_fl2v_turbo_4step_v1.1_768p_comfyui_resized_avg_rank_64_bf16.safetensors",
             "gb": 0.87,
-            "note": "author's training shift: video 6 / audio 3 (not core's 12/3). community (drbaph): v1.1, newer than the official v1.0",
+            "note": "Community resized distillation: validate reference adherence, motion and audio against the matching original.",
             "official": false
           },
           {
@@ -1053,7 +1061,7 @@
             "file": "loras/minimax_h3_fl2v_lightx2v_turbo_8step_v1.0_resized_avg_rank_24_bf16.safetensors",
             "gb": 0.34,
             "official": false,
-            "note": "community (Kijai): 6x lighter BUT measured to degrade — breaks camera motion and ignores the prompt in i2v"
+            "note": "Community resized distillation: validate reference adherence, motion and audio against the matching original."
           },
           {
             "label": "4-step 768p resized (rank 31)",
@@ -1061,7 +1069,7 @@
             "file": "loras/minimax_h3_fl2v_lightx2v_turbo_4step_v1.0_768p_resized_avg_rank_31_bf16.safetensors",
             "gb": 0.41,
             "official": false,
-            "note": "author's training shift: video 6 / audio 3 (not core's 12/3). community (Kijai): 6x lighter BUT measured to degrade — breaks camera motion and ignores the prompt in i2v"
+            "note": "Community resized distillation: validate reference adherence, motion and audio against the matching original."
           },
           {
             "label": "4-step (larryvrh, most adopted)",
@@ -1071,7 +1079,8 @@
             "note": "community (larryvrh): 846 likes, 606k dl/30d",
             "official": false
           }
-        ]
+        ],
+        "optional": true
       },
       "preview vae": {
         "folder": "vae_approx",
@@ -1186,19 +1195,19 @@
         "options": [
           {
             "label": "Union pruned bf16",
-            "repo": "Kijai/MiniMax-H3-experimental",
-            "file": "controlnet/minimax_h3_fun_controlnet_union_pruned_bf16.safetensors",
-            "gb": 3.93,
-            "note": "pose/depth/canny/HED/MLSD; core support since 31-aug (master); load with ModelPatchLoader -> Apply MiniMax H3 Fun ControlNet",
-            "official": false
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "model_patches/minimax_h3_fun_controlnet_union_pruned_bf16.safetensors",
+            "gb": 3.932,
+            "note": "Pose/depth/canny/HED/MLSD and inpainting. Needs supported ComfyUI core; models/model_patches, loaded with ModelPatchLoader.",
+            "official": true
           },
           {
             "label": "Union pruned int8",
-            "repo": "Kijai/MiniMax-H3-experimental",
-            "file": "controlnet/minimax_h3_fun_controlnet_union_pruned_int8_convrot.safetensors",
-            "gb": 2.14,
-            "note": "same, int8 convrot (needs cu130 kernels like the int8 DiT)",
-            "official": false
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "model_patches/minimax_h3_fun_controlnet_union_pruned_int8_convrot.safetensors",
+            "gb": 2.139,
+            "note": "Pose/depth/canny/HED/MLSD and inpainting. Needs supported ComfyUI core; models/model_patches, loaded with ModelPatchLoader.",
+            "official": true
           }
         ]
       },
@@ -1224,20 +1233,29 @@
           }
         ]
       }
-    }
+    },
+    "reviewed": "2026-10-07"
   },
   "minimax-h3-ref": {
     "name": "MiniMax H3 (Ref2VA)",
-    "about": "Reference-to-video: up to 9 images + 3 videos + 3 audios lock identity, style and voice. Shares TE/VAEs with FL2VA",
+    "about": "Ref2VA: multimodal references (identity/style/motion/voice); fidelity depends on the render. Choose components individually. FP8 fallback for cu128; INT8 prefers torch cu130 + compatible kernels. Turbo is optional.",
     "components": {
       "diffusion": {
         "folder": "diffusion_models",
         "options": [
           {
+            "label": "pruned fp8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
+            "gb": 19.519,
+            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
+            "official": true
+          },
+          {
             "label": "bf16 (full)",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_bf16.safetensors",
-            "gb": 61.73,
+            "gb": 61.729,
             "note": "no special requirements; highest VRAM",
             "official": true
           },
@@ -1245,7 +1263,7 @@
             "label": "int8 full",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors",
-            "gb": 31.7,
+            "gb": 31.701,
             "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
             "official": true
           },
@@ -1253,7 +1271,7 @@
             "label": "pruned bf16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "diffusion_models/minimax_h3_ref2va_pruned_bf16.safetensors",
-            "gb": 37.46,
+            "gb": 37.463,
             "note": "no special requirements; highest VRAM",
             "official": true
           },
@@ -1272,14 +1290,6 @@
             "file": "diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
             "gb": 19.53,
             "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
-            "official": true
-          },
-          {
-            "label": "pruned fp8",
-            "repo": "Comfy-Org/MiniMax-H3",
-            "file": "diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors",
-            "gb": 19.52,
-            "note": "runs on Ampere and newer; lowers VRAM but does not speed up on Ampere",
             "official": true
           },
           {
@@ -1313,7 +1323,7 @@
             "repo": "Abiray/Minimax-H3-nvfp4-INT4-INT8-Convrot",
             "file": "MiniMax_H3_Ref2VA_pruned_nvfp4.safetensors",
             "gb": 11.67,
-            "note": "community (Abiray): not published by Comfy-Org. Faster on Blackwell",
+            "note": "Community diffusion NVFP4 build: verify Blackwell-only requirements for this exact file; not the NVFP4 AWQ text encoder.",
             "official": false
           },
           {
@@ -1322,7 +1332,7 @@
             "file": "minimax_h3_ref2va_pruned_w4a8_mixed.safetensors",
             "gb": 10.96,
             "official": false,
-            "note": "community (Kijai): smallest, but MEASURED 3x SLOWER than int8 (146 vs 53 s/step). Open issue"
+            "note": "Community experimental quant; speed/quality depend on backend. Historical benchmarks are not a guarantee."
           },
           {
             "label": "GGUF Q4_K_M (pruned)",
@@ -1332,6 +1342,14 @@
             "folder": "unet",
             "note": "community (Abiray): requires the ComfyUI-GGUF nodepack (city96)",
             "official": false
+          },
+          {
+            "label": "pruned w6a8",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "diffusion_models/minimax_h3_ref2va_pruned_w6a8.safetensors",
+            "gb": 14.886,
+            "note": "6-bit weights / INT8 activations; needs current H3 loader and compatible convrot kernels. Disk size is not peak VRAM.",
+            "official": true
           }
         ]
       },
@@ -1339,10 +1357,18 @@
         "folder": "text_encoders",
         "options": [
           {
+            "label": "nvfp4_awq",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+            "gb": 14.61,
+            "note": "Official quant; does not require Blackwell. Encoding performance depends on GPU/backend.",
+            "official": true
+          },
+          {
             "label": "bf16",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors",
-            "gb": 47.97,
+            "gb": 47.969,
             "note": "no special requirements; highest VRAM",
             "official": true
           },
@@ -1350,16 +1376,8 @@
             "label": "int8",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
-            "gb": 25.28,
+            "gb": 25.277,
             "note": "requires torch cu130 + kernels; falls back to eager (slow) without them",
-            "official": true
-          },
-          {
-            "label": "nvfp4_awq",
-            "repo": "Comfy-Org/MiniMax-H3",
-            "file": "text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
-            "gb": 14.61,
-            "note": "runs without Blackwell, but ~2x slower outside it",
             "official": true
           }
         ]
@@ -1376,11 +1394,11 @@
           },
           {
             "label": "int8 convrot",
-            "repo": "Kijai/MiniMax-H3-experimental",
-            "file": "minimax_h3_video_vae_int8_convrot.safetensors",
-            "gb": 2.95,
-            "official": false,
-            "note": "community (Kijai): 2x faster DECODE only (19.5s -> 10.0s), quality loss invisible. Does not affect sampling"
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "vae/minimax_h3_video_vae_int8_convrot.safetensors",
+            "gb": 2.618,
+            "official": true,
+            "note": "Official INT8 video VAE; verify core/kernel compatibility. Existing same-name files are skipped, not overwritten."
           }
         ]
       },
@@ -1391,7 +1409,7 @@
             "label": "fp32",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
-            "gb": 0.56,
+            "gb": 0.564,
             "official": true
           }
         ]
@@ -1403,7 +1421,7 @@
             "label": "ref2v 4-step v0.1 (template; early)",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
-            "gb": 1.82,
+            "gb": 1.822,
             "official": true
           },
           {
@@ -1412,9 +1430,10 @@
             "file": "loras/minimax_h3_ref2v_lightx2v_turbo_4step_v0.1_resized_avg_rank_20_bf16.safetensors",
             "gb": 0.29,
             "official": false,
-            "note": "community (Kijai) resized. ⚠️ the ref2v turbo breaks identity reference, and resized also degrades camera motion"
+            "note": "Community resized distillation: validate reference adherence, motion and audio against the matching original."
           }
-        ]
+        ],
+        "optional": true
       },
       "preview vae": {
         "folder": "vae_approx",
@@ -1464,19 +1483,19 @@
         "options": [
           {
             "label": "Union pruned bf16",
-            "repo": "Kijai/MiniMax-H3-experimental",
-            "file": "controlnet/minimax_h3_fun_controlnet_union_pruned_bf16.safetensors",
-            "gb": 3.93,
-            "note": "pose/depth/canny/HED/MLSD; core support since 31-aug (master); load with ModelPatchLoader -> Apply MiniMax H3 Fun ControlNet",
-            "official": false
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "model_patches/minimax_h3_fun_controlnet_union_pruned_bf16.safetensors",
+            "gb": 3.932,
+            "note": "Pose/depth/canny/HED/MLSD and inpainting. Needs supported ComfyUI core; models/model_patches, loaded with ModelPatchLoader.",
+            "official": true
           },
           {
             "label": "Union pruned int8",
-            "repo": "Kijai/MiniMax-H3-experimental",
-            "file": "controlnet/minimax_h3_fun_controlnet_union_pruned_int8_convrot.safetensors",
-            "gb": 2.14,
-            "note": "same, int8 convrot (needs cu130 kernels like the int8 DiT)",
-            "official": false
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "model_patches/minimax_h3_fun_controlnet_union_pruned_int8_convrot.safetensors",
+            "gb": 2.139,
+            "note": "Pose/depth/canny/HED/MLSD and inpainting. Needs supported ComfyUI core; models/model_patches, loaded with ModelPatchLoader.",
+            "official": true
           }
         ]
       },
@@ -1502,7 +1521,8 @@
           }
         ]
       }
-    }
+    },
+    "reviewed": "2026-10-07"
   },
   "wan-2.2": {
     "name": "Wan 2.2 (i2v)",

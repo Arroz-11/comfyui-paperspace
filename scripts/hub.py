@@ -572,11 +572,6 @@ def _hf_stream(repo, file, folder, token=None, progress=None, rename=None):
     return target, True
 
 
-class _Dummy:
-    """Stand-in for a checkbox not built yet: counts as unchecked."""
-    value = False
-
-
 # ── Model presets ───────────────────────────────────────────────
 def _presets():
     """presets.json (versioned) + presets.local.json (optional, NOT versioned).
@@ -608,10 +603,11 @@ def _presets():
 
 
 def presets_ui():
-    """Per-component quant picker: each component (diffusion, text encoder…)
-    has its own dropdown of quant options, so you can mix e.g. bf16 diffusion
-    with fp8 text encoder. Single-option components (vae…) show as fixed rows.
-    First option in the JSON = default."""
+    """Opt-in downloads: tick each component, then pick its quantisation.
+
+    Nothing is selected initially, including single-option components. First
+    option in the JSON is the quant default, not permission to download it.
+    """
     import ipywidgets as W
     from IPython.display import display
 
@@ -625,13 +621,13 @@ def presets_ui():
         layout=W.Layout(width="320px"))
     comp_box = W.VBox()
     table = W.HTML()
-    dl_btn = W.Button(description="⬇️ Download missing", button_style="success",
-                      layout=W.Layout(width="180px", height="34px"))
+    dl_btn = W.Button(description="⬇️ Download selected", button_style="success",
+                      layout=W.Layout(width="200px", height="34px"))
     bar = W.FloatProgress(min=0, max=100,
                           layout=W.Layout(width="700px", visibility="hidden"))
     lbl = W.HTML()
     dds = {}   # component name -> Dropdown (multi-option components only)
-    chks = {}  # component name -> Checkbox (components marked "optional")
+    chks = {}  # component name -> Checkbox (every component)
 
     def _comps():
         return presets[model_dd.value]["components"]
@@ -643,12 +639,12 @@ def presets_ui():
 
     def _selection():
         """[(component name, comp, chosen option)] — dropdown pick or only option.
-        Components marked "optional": true are skipped unless their checkbox is on.
+        Every component is skipped unless its checkbox is on.
         Components marked "multi": true return EVERY ticked option instead of one
         (style LoRAs… where you may want several, or none)."""
         sel = []
         for name, comp in _comps().items():
-            if comp.get("optional") and not chks.get(name, _Dummy()).value:
+            if not chks[name].value:
                 continue
             w = dds.get(name)
             if comp.get("multi"):
@@ -660,7 +656,10 @@ def presets_ui():
 
     def _render(_=None):
         rows, total, missing = [], 0.0, 0.0
-        for name, comp, opt in _selection():
+        selection = _selection()
+        for name, dd in dds.items():
+            dd.disabled = not chks[name].value
+        for name, comp, opt in selection:
             path, folder = _target(comp, opt)
             have = path.exists()
             total += opt["gb"]
@@ -677,22 +676,23 @@ def presets_ui():
                        + "".join(rows) + "</table>"
                        + f"<b>selected: {total:.1f} GB"
                        + (f" · to download: {missing:.1f} GB</b>" if missing
-                          else " · ✅ complete — nothing to download</b>"))
+                          else (" · ✅ selected files already installed</b>" if selection
+                                else " · tick the components you want to download</b>")))
         dl_btn.disabled = missing == 0
 
-    def _build(_=None):
+    def _build(_=None, preserve=False):
+        checked = {name: ck.value for name, ck in chks.items()} if preserve else {}
+        choices = {name: dd.value for name, dd in dds.items()} if preserve else {}
         dds.clear()
         chks.clear()
         widgets = []
         for name, comp in _comps().items():
             opts = comp["options"]
-            if comp.get("optional"):
-                # opt-in: optional components are skipped unless ticked
-                ck = W.Checkbox(value=False, description=f"{name} (opcional)",
-                                indent=False, layout=W.Layout(width="460px"))
-                ck.observe(_render, names="value")
-                chks[name] = ck
-                widgets.append(ck)
+            ck = W.Checkbox(value=checked.get(name, False), description=name,
+                            indent=False, layout=W.Layout(width="460px"))
+            ck.observe(_render, names="value")
+            chks[name] = ck
+            widgets.append(ck)
             if len(opts) < 2 and not comp.get("multi"):
                 continue   # fixed component -> table row only
 
@@ -709,12 +709,12 @@ def presets_ui():
             if comp.get("multi"):
                 dd = W.SelectMultiple(
                     options=[(_label(o), i) for i, o in enumerate(opts)],
-                    value=(), description=name, rows=min(len(opts), 8),
+                    value=choices.get(name, ()), description=name, rows=min(len(opts), 8),
                     style={"description_width": "110px"},
                     layout=W.Layout(width="620px"))
             else:
                 dd = W.Dropdown(options=[(_label(o), i) for i, o in enumerate(opts)],
-                                value=0, description=name,
+                                value=choices.get(name, 0), description=name,
                                 style={"description_width": "110px"},
                                 layout=W.Layout(width="620px"))
             dd.observe(_render, names="value")
@@ -759,12 +759,14 @@ def presets_ui():
             bar.value = 100
             bar.layout.visibility = "hidden"
             lbl.value = "✅ done"
-            _build()   # refresh ✓ marks in the dropdowns too
+            _build(preserve=True)   # refresh installed marks, keep selections
 
     model_dd.observe(_build, names="value")
     dl_btn.on_click(_download)
     _build()
-    display(W.VBox([W.HTML("<h3>📦 Model Presets</h3>"), model_dd, comp_box,
+    display(W.VBox([W.HTML("<h3>📦 Model Presets</h3>"
+                          "Tick only what you need. Shared files already installed are skipped."),
+                    model_dd, comp_box,
                     table, dl_btn, bar, lbl, out]))
 
 

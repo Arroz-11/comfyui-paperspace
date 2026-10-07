@@ -20,8 +20,9 @@ ComfyUI in the cloud.
   - **ComfyUI panel**: start / stop / restart, version checker, one-click update
   - **Model downloaders**: Civitai (paste any model page URL) and HuggingFace
     (browse a repo, pick files), with live progress and gated-repo access check
-  - **Model presets**: complete model packs (diffusion + text encoder + VAE)
-    with a bf16 / fp8 switch — downloads only what's missing
+  - **Model presets**: a checkbox for every component (diffusion, text encoder,
+    VAE and extras), plus its quant picker. Nothing selected by default;
+    downloads only selected files that are missing
   - **Disk cleaner**: browse and delete safely, plus a storage overview of
     what's eating your quota
   - **Cloudflare R2** upload/download (optional)
@@ -64,6 +65,27 @@ cleaner are all there. To watch what a boot is doing, open a terminal:
 tail -f /notebooks/logs/boot.log      # boot progress
 tail -f /notebooks/logs/comfyui.log   # ComfyUI's own log
 ```
+
+### Download individual components
+
+In **Model Presets**, choose the model, tick the components you need, choose
+their quantisations, then press **Download selected**. You can download just
+the diffusion model without its encoder/VAEs. Shared files already installed
+are skipped, and your selections stay checked after downloading. Switching
+models starts with no components selected.
+
+For inference you still need the components referenced by your workflow;
+partial downloads are useful when the other files are already installed.
+After updating the repo, reload `Hub.ipynb` from disk and rerun the Model
+Presets cell. It reloads its helper automatically before rebuilding controls.
+
+MiniMax H3 presets were reviewed on **2026-10-07** against
+[Comfy-Org's files](https://huggingface.co/Comfy-Org/MiniMax-H3/tree/main):
+W6A8 pruned and the official INT8 video VAE/ControlNet are available as
+choices. FP8 pruned and the NVFP4 AWQ encoder remain the initial quant
+choices for this repo's configured cu128 setup. Nothing is auto-downloaded.
+Turbo is optional; the base model can run without it. Picking a quant does
+not validate the GPU, ComfyUI version or kernels on your running machine.
 
 `scripts/extras/fixes.sh` has on-demand fixes for known issues (run by hand,
 each one documented inside).
