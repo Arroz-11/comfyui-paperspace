@@ -1232,6 +1232,36 @@
             "official": false
           }
         ]
+      },
+      "latent upscaler": {
+        "folder": "latent_upscale_models",
+        "optional": true,
+        "options": [
+          {
+            "label": "H3 3D original fp32",
+            "repo": "LBH-123-AI/Minimax_h3_latent_Upscaler",
+            "file": "minimax_h3_latent_upscaler_3d_conv_v1/minimax_h3_latent_upscaler_3d_conv_v1_fp32.pth",
+            "gb": 1.286,
+            "official": false,
+            "note": "For AIMixer Director Refine / SelfLift. Select in latent_upscale_model, not refine_model. Community original; no separate nodepack required in current Director."
+          },
+          {
+            "label": "H3 3D original bf16 (compact)",
+            "repo": "LBH-123-AI/Minimax_h3_latent_Upscaler",
+            "file": "minimax_h3_latent_upscaler_3d_conv_v1/minimax_h3_latent_upscaler_3d_conv_v1_bf16.safetensors",
+            "gb": 0.643,
+            "official": false,
+            "note": "Compact storage alternative. Current AIMixer Director runs the upscaler in FP32 for stability; storage precision is not execution precision."
+          },
+          {
+            "label": "H3 LMS v0.1 fp32 (experimental)",
+            "repo": "Alissonerdx/Minimax-H3-ComfyUI",
+            "file": "latent_upscaler/h3_upscaler_lms_v0.1_fp32.safetensors",
+            "gb": 1.286,
+            "official": false,
+            "note": "Community fine-tune; compare identity and temporal stability against the original. Not a guaranteed quality improvement."
+          }
+        ]
       }
     },
     "reviewed": "2026-10-07"
@@ -1418,6 +1448,14 @@
         "folder": "loras",
         "options": [
           {
+            "label": "ref2v 8-step v1.0 768p (author)",
+            "repo": "lightx2v/Minimax-h3-Turbo",
+            "file": "minimax_h3_ref2v_turbo_8step_v1.0_768p_comfyui_bf16.safetensors",
+            "gb": 1.822,
+            "official": true,
+            "note": "Ref2VA only: 8 steps, Euler, simple, CFG 1, shifts video 12 / audio 3. Author recommends up to 768p. Do not use the 4-step recipe."
+          },
+          {
             "label": "ref2v 4-step v0.1 (template; early)",
             "repo": "Comfy-Org/MiniMax-H3",
             "file": "loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
@@ -1518,6 +1556,36 @@
             "gb": 1.61,
             "note": "same, for the unpruned DiT",
             "official": false
+          }
+        ]
+      },
+      "latent upscaler": {
+        "folder": "latent_upscale_models",
+        "optional": true,
+        "options": [
+          {
+            "label": "H3 3D original fp32",
+            "repo": "LBH-123-AI/Minimax_h3_latent_Upscaler",
+            "file": "minimax_h3_latent_upscaler_3d_conv_v1/minimax_h3_latent_upscaler_3d_conv_v1_fp32.pth",
+            "gb": 1.286,
+            "official": false,
+            "note": "For AIMixer Director Refine / SelfLift. Select in latent_upscale_model, not refine_model. Community original; no separate nodepack required in current Director."
+          },
+          {
+            "label": "H3 3D original bf16 (compact)",
+            "repo": "LBH-123-AI/Minimax_h3_latent_Upscaler",
+            "file": "minimax_h3_latent_upscaler_3d_conv_v1/minimax_h3_latent_upscaler_3d_conv_v1_bf16.safetensors",
+            "gb": 0.643,
+            "official": false,
+            "note": "Compact storage alternative. Current AIMixer Director runs the upscaler in FP32 for stability; storage precision is not execution precision."
+          },
+          {
+            "label": "H3 LMS v0.1 fp32 (experimental)",
+            "repo": "Alissonerdx/Minimax-H3-ComfyUI",
+            "file": "latent_upscaler/h3_upscaler_lms_v0.1_fp32.safetensors",
+            "gb": 1.286,
+            "official": false,
+            "note": "Community fine-tune; compare identity and temporal stability against the original. Not a guaranteed quality improvement."
           }
         ]
       }
