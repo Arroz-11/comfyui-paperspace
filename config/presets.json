@@ -1048,6 +1048,38 @@
             "note": "author's training shift: video 6 / audio 3 (not core's 12/3)."
           },
           {
+            "label": "HyperFlow 8-step bf16 (full base)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_hyperflow_8step_v1.0_comfyui_bf16.safetensors",
+            "gb": 3.93,
+            "note": "Community conversion of Video Rebirth HyperFlow (T2VA/FL2VA/Ref2VA). For the full base (bf16 / int8 full), not for pruned bases or finetunes. 8 steps, Euler, simple, CFG 1, LoRA 1.0, shift 12/3 (or the repo's manual sigmas); replaces the other turbo LoRA, do not stack two turbos.",
+            "official": false
+          },
+          {
+            "label": "HyperFlow 8-step pruned bf16 (pruned base / finetunes)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_hyperflow_8step_v1.0_comfyui_pruned_bf16.safetensors",
+            "gb": 3.91,
+            "note": "Community conversion of Video Rebirth HyperFlow (T2VA/FL2VA/Ref2VA). For pruned bases (fp8/int8/w6a8/GGUF pruned) and finetunes built on them. 8 steps, Euler, simple, CFG 1, LoRA 1.0, shift 12/3 (or the repo's manual sigmas); replaces the other turbo LoRA, do not stack two turbos.",
+            "official": false
+          },
+          {
+            "label": "HyperFlow 8-step resized bf16 (rank 20, full base)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_hyperflow_8step_v1.0_comfyui_bf16_resized_avg_rank_20_bf16.safetensors",
+            "gb": 0.32,
+            "note": "Light version of the full-base HyperFlow; same recipe. Community resized distillation: validate reference adherence, motion and audio against the matching original.",
+            "official": false
+          },
+          {
+            "label": "HyperFlow 8-step pruned resized bf16 (rank 20, pruned base / finetunes)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_hyperflow_8step_v1.0_comfyui_pruned_bf16_resized_avg_rank_20_bf16.safetensors",
+            "gb": 0.32,
+            "note": "Light version of the pruned HyperFlow (pruned bases and finetunes); same recipe. Community resized distillation: validate reference adherence, motion and audio against the matching original.",
+            "official": false
+          },
+          {
             "label": "4-step v1.1 768p resized (rank 64)",
             "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
             "file": "minimax_h3_fl2v_turbo_4step_v1.1_768p_comfyui_resized_avg_rank_64_bf16.safetensors",
@@ -1461,6 +1493,38 @@
             "file": "loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors",
             "gb": 1.822,
             "official": true
+          },
+          {
+            "label": "HyperFlow 8-step bf16 (full base)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_hyperflow_8step_v1.0_comfyui_bf16.safetensors",
+            "gb": 3.93,
+            "note": "Community conversion of Video Rebirth HyperFlow (T2VA/FL2VA/Ref2VA). For the full base (bf16 / int8 full), not for pruned bases or finetunes. 8 steps, Euler, simple, CFG 1, LoRA 1.0, shift 12/3 (or the repo's manual sigmas); replaces the other turbo LoRA, do not stack two turbos.",
+            "official": false
+          },
+          {
+            "label": "HyperFlow 8-step pruned bf16 (pruned base / finetunes)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_hyperflow_8step_v1.0_comfyui_pruned_bf16.safetensors",
+            "gb": 3.91,
+            "note": "Community conversion of Video Rebirth HyperFlow (T2VA/FL2VA/Ref2VA). For pruned bases (fp8/int8/w6a8/GGUF pruned) and finetunes built on them. 8 steps, Euler, simple, CFG 1, LoRA 1.0, shift 12/3 (or the repo's manual sigmas); replaces the other turbo LoRA, do not stack two turbos.",
+            "official": false
+          },
+          {
+            "label": "HyperFlow 8-step resized bf16 (rank 20, full base)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_hyperflow_8step_v1.0_comfyui_bf16_resized_avg_rank_20_bf16.safetensors",
+            "gb": 0.32,
+            "note": "Light version of the full-base HyperFlow; same recipe. Community resized distillation: validate reference adherence, motion and audio against the matching original.",
+            "official": false
+          },
+          {
+            "label": "HyperFlow 8-step pruned resized bf16 (rank 20, pruned base / finetunes)",
+            "repo": "drbaph/MiniMax-H3-Turbo-Lora-ComfyUI",
+            "file": "minimax_h3_hyperflow_8step_v1.0_comfyui_pruned_bf16_resized_avg_rank_20_bf16.safetensors",
+            "gb": 0.32,
+            "note": "Light version of the pruned HyperFlow (pruned bases and finetunes); same recipe. Community resized distillation: validate reference adherence, motion and audio against the matching original.",
+            "official": false
           },
           {
             "label": "ref2v 4-step resized (rank 20)",
