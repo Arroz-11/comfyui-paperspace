@@ -1656,6 +1656,60 @@
     },
     "reviewed": "2026-10-07"
   },
+  "minimax-h3-eros": {
+    "name": "MiniMax H3 FL2VA Eros",
+    "about": "Eros Max beta7 fix1 (8-step turbo integrado, sin turbo LoRA) + TE int8 + VAE video fp16 + VAE audio fp32. Requiere ComfyUI >=0.44 y VSA (BlockSparseAttention).",
+    "components": {
+      "diffusion": {
+        "folder": "diffusion_models",
+        "options": [
+          {
+            "label": "Eros Max 8-step HQ int8 protected edges",
+            "repo": "TenStrip/10Eros-Max",
+            "file": "10Eros_Max_h3_8stepTURBO_beta7_fix1-native_int8_protected_edges_HQ.safetensors",
+            "gb": 22.936,
+            "official": false
+          }
+        ]
+      },
+      "text encoder": {
+        "folder": "text_encoders",
+        "options": [
+          {
+            "label": "int8 convrot",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+            "gb": 27.141,
+            "official": true
+          }
+        ]
+      },
+      "vae video": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "vae/minimax_h3_video_vae_fp16.safetensors",
+            "gb": 5.208,
+            "official": true
+          }
+        ]
+      },
+      "vae audio": {
+        "folder": "vae",
+        "options": [
+          {
+            "label": "fp32",
+            "repo": "Comfy-Org/MiniMax-H3",
+            "file": "vae/minimax_h3_audio_vae_fp32.safetensors",
+            "gb": 0.605,
+            "official": true
+          }
+        ]
+      }
+    }
+  },
   "wan-2.2": {
     "name": "Wan 2.2 (i2v)",
     "about": "Image to video, 14B MoE — needs BOTH experts (high-noise = motion/layout, low-noise = detail). 720x1280, 81 frames, 16 fps native. Output at 32 fps if you RIFE x2",
