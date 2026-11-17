@@ -1178,3 +1178,191 @@ def r2_ui():
     for i, t in enumerate(["⚙️ Config", "⬆️ Upload", "⬇️ Download"]):
         tabs.set_title(i, t)
     display(W.VBox([W.HTML("<h3>☁️ Cloudflare R2</h3>"), tabs]))
+
+
+# ── Workflow switch ─────────────────────────────────────────────
+# One call prepares the machine for a workflow family: everything in the
+# managed folders that the workflow does not use is deleted, then what is
+# missing comes from R2 (preferred) or HuggingFace. Never Civitai.
+MANAGED = ("diffusion_models", "unet", "checkpoints", "loras",
+           "text_encoders", "clip", "vae")
+SWITCH_LOG = ROOT / "logs" / "switch.log"
+SWITCH_STATE = ROOT / "logs" / "switch.json"
+
+
+def _r2_index(prefixes):
+    """basename -> (key, size) for the whole bucket; the family's own prefixes win."""
+    s3, bucket = _r2_client()
+    found = {}
+    for page in s3.get_paginator("list_objects_v2").paginate(Bucket=bucket):
+        for o in page.get("Contents", []):
+            name = o["Key"].rsplit("/", 1)[-1]
+            if not name or o["Key"].startswith("output/"):
+                continue
+            mine = any(o["Key"].startswith(p) for p in prefixes)
+            if name not in found or mine:
+                found[name] = (o["Key"], o["Size"], mine)
+    return found
+
+
+def _preset_index():
+    """basename -> {repo, file, folder, gb} from presets.json."""
+    out = {}
+    for model in _presets().values():
+        for comp in model.get("components", {}).values():
+            for o in comp.get("options", []):
+                if o.get("repo") and o.get("file"):
+                    name = o.get("as") or o["file"].rsplit("/", 1)[-1]
+                    out[name] = {"repo": o["repo"], "file": o["file"],
+                                 "folder": o.get("folder") or comp.get("folder"),
+                                 "gb": o.get("gb")}
+    return out
+
+
+def _hf_size(repo, file, token):
+    import requests
+    try:
+        h = requests.head(f"https://huggingface.co/{repo}/resolve/main/{urllib.parse.quote(file)}",
+                          headers={"Authorization": f"Bearer {token}"} if token else {},
+                          allow_redirects=True, timeout=30)
+        return int(h.headers.get("Content-Length") or 0) if h.ok else 0
+    except Exception:
+        return 0
+
+
+def switch_plan(spec):
+    """spec: {"want": [{"name", "folder"?, "hf": {"repo", "file"}?}],
+              "r2_prefixes": ["krea2-loras/"], "r2_folder": "loras"}
+    Every file under r2_prefixes is wanted too (into r2_folder)."""
+    token = _keys().get("huggingface") or None
+    prefixes = spec.get("r2_prefixes") or []
+    r2 = _r2_index(prefixes)
+    presets = _preset_index()
+
+    have = {}
+    for folder in MANAGED:
+        base = MODELS / folder
+        if base.is_dir():
+            for p in base.rglob("*"):
+                if p.is_file() and not p.name.startswith("put_"):
+                    have.setdefault(p.name, []).append(p)
+
+    want = {}
+    for w in spec.get("want", []):
+        want[w["name"].replace("\\", "/").rsplit("/", 1)[-1]] = w
+    for name, (key, _, mine) in r2.items():
+        if mine and name not in want:
+            want[name] = {"name": name, "folder": spec.get("r2_folder") or "loras"}
+
+    keep, download, missing = [], [], []
+    for name, w in sorted(want.items()):
+        if name in have:
+            keep.append(name)
+            continue
+        if any((MODELS / f / name).exists() for f in os.listdir(MODELS) if (MODELS / f).is_dir()):
+            keep.append(name)          # lives in an unmanaged folder (vae_approx, SEEDVR2...)
+            continue
+        p = presets.get(name, {})
+        folder = w.get("folder") or p.get("folder") or "loras"
+        if name in r2:
+            key, size, _ = r2[name]
+            download.append({"name": name, "folder": folder, "source": "r2", "key": key, "size": size})
+        elif w.get("hf") or p:
+            hf = w.get("hf") or {"repo": p["repo"], "file": p["file"]}
+            size = _hf_size(hf["repo"], hf["file"], token) or int((p.get("gb") or 0) * 1024 ** 3)
+            download.append({"name": name, "folder": folder, "source": "hf",
+                             "repo": hf["repo"], "file": hf["file"], "size": size})
+        else:
+            missing.append(name)
+
+    delete = [{"path": str(p.relative_to(MODELS)), "size": p.stat().st_size}
+              for name, paths in sorted(have.items()) if name not in want for p in paths]
+    delete_bytes = sum(d["size"] for d in delete)
+    download_bytes = sum(d["size"] for d in download)
+    return {"keep": keep, "delete": delete, "download": download, "missing": missing,
+            "delete_bytes": delete_bytes, "download_bytes": download_bytes,
+            "disk_after_bytes": _dir_size(ROOT) - delete_bytes + download_bytes}
+
+
+def _switch_state(**kw):
+    SWITCH_STATE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = SWITCH_STATE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(dict(kw, at=time.time())))
+    tmp.replace(SWITCH_STATE)
+
+
+def switch_apply(plan):
+    """Runs a plan from switch_plan. Progress goes to logs/switch.json."""
+    SWITCH_LOG.parent.mkdir(parents=True, exist_ok=True)
+    log = SWITCH_LOG.open("a", encoding="utf-8")
+
+    def say(text):
+        log.write(f"{_now()} {text}\n")
+        log.flush()
+
+    total = len(plan["download"])
+    errors = []
+    _switch_state(state="running", pid=os.getpid(), step="deleting", done=0, total=total, errors=[])
+    for d in plan["delete"]:
+        p = MODELS / d["path"]
+        try:
+            p.unlink()
+            say(f"deleted {d['path']}")
+        except FileNotFoundError:
+            pass
+        except OSError as e:
+            errors.append(f"{d['path']}: {e}")
+            say(f"delete failed {d['path']}: {e}")
+
+    token = _keys().get("huggingface") or None
+    s3 = bucket = None
+    for i, d in enumerate(plan["download"], 1):
+        _switch_state(state="running", pid=os.getpid(), step=d["name"], done=i - 1,
+                      total=total, errors=errors)
+        dest = MODELS / d["folder"]
+        dest.mkdir(parents=True, exist_ok=True)
+        try:
+            if d["source"] == "r2":
+                if s3 is None:
+                    s3, bucket = _r2_client()
+                part = dest / (d["name"] + ".part")
+                s3.download_file(bucket, d["key"], str(part))
+                part.replace(dest / d["name"])
+            else:
+                _hf_stream(d["repo"], d["file"], d["folder"], token=token, rename=d["name"])
+            say(f"downloaded {d['folder']}/{d['name']} from {d['source']}")
+        except Exception as e:
+            errors.append(f"{d['name']}: {e}")
+            say(f"download failed {d['name']}: {e}")
+            (dest / (d["name"] + ".part")).unlink(missing_ok=True)
+    _switch_state(state="failed" if errors else "done", pid=os.getpid(), step="",
+                  done=total, total=total, errors=errors)
+    say(f"finished, {len(errors)} error(s)")
+    log.close()
+
+
+def switch_status():
+    try:
+        s = json.loads(SWITCH_STATE.read_text())
+    except (OSError, ValueError):
+        return {"state": "idle"}
+    if s.get("state") == "running":
+        try:
+            os.kill(s["pid"], 0)
+        except OSError:
+            s["state"] = "failed"
+            s.setdefault("errors", []).append("switch process died")
+    return s
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) >= 3 and sys.argv[1] == "switch":
+        spec = json.loads(pathlib.Path(sys.argv[2]).read_text())
+        plan = switch_plan(spec)
+        if "--apply" in sys.argv:
+            switch_apply(plan)
+        else:
+            print(json.dumps(plan, indent=1))
+    else:
+        print("usage: python hub.py switch spec.json [--apply]")
