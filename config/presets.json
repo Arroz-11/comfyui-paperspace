@@ -953,7 +953,7 @@
             "official": true
           },
           {
-            "label": "PinkCherry hybrid v1.8 int8 pruned (NSFW finetune)",
+            "label": "PinkCherry hybrid v1.8 int8 pruned",
             "repo": "SexGod1979/PinkCherry-NSFW_MiniMax-H3",
             "file": "1.8-hybrid/PinkCherry_hybrid_v1.8_int8_minimax_h3_pruned.safetensors",
             "gb": 21.056,

@@ -1232,7 +1232,7 @@ def _hf_size(repo, file, token):
 
 def switch_plan(spec):
     """spec: {"want": [{"name", "folder"?, "hf": {"repo", "file"}?}],
-              "r2_prefixes": ["krea2-loras/"], "r2_folder": "loras"}
+              "r2_prefixes": ["<family>/"], "r2_folder": "loras"}
     Every file under r2_prefixes is wanted too (into r2_folder)."""
     token = _keys().get("huggingface") or None
     prefixes = spec.get("r2_prefixes") or []
