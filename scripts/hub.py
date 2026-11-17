@@ -1263,9 +1263,15 @@ def switch_plan(spec):
             keep.append(name)          # lives in an unmanaged folder (vae_approx, SEEDVR2...)
             continue
         p = presets.get(name, {})
-        folder = w.get("folder") or p.get("folder") or "loras"
+        folder = p.get("folder") or w.get("folder")   # the preset knows better than the loader class
+        if not folder and name not in r2:
+            missing.append(name)
+            continue
         if name in r2:
-            key, size, _ = r2[name]
+            key, size, mine = r2[name]
+            top = key.split("/")[0]
+            folder = folder or ((spec.get("r2_folder") or "loras") if mine
+                                else top if (MODELS / top).is_dir() else "loras")
             download.append({"name": name, "folder": folder, "source": "r2", "key": key, "size": size})
         elif w.get("hf") or p:
             hf = w.get("hf") or {"repo": p["repo"], "file": p["file"]}

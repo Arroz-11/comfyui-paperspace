@@ -951,6 +951,13 @@
             "gb": 14.886,
             "note": "6-bit weights / INT8 activations; needs current H3 loader and compatible convrot kernels. Disk size is not peak VRAM.",
             "official": true
+          },
+          {
+            "label": "PinkCherry hybrid v1.8 int8 pruned (NSFW finetune)",
+            "repo": "SexGod1979/PinkCherry-NSFW_MiniMax-H3",
+            "file": "1.8-hybrid/PinkCherry_hybrid_v1.8_int8_minimax_h3_pruned.safetensors",
+            "gb": 21.056,
+            "official": false
           }
         ]
       },
@@ -2101,6 +2108,36 @@
             "file": "text_encoders/gemma4_e2b_it_bf16.safetensors",
             "gb": 9.57,
             "official": true
+          }
+        ]
+      }
+    }
+  },
+  "seedvr2": {
+    "name": "SeedVR2 upscaler",
+    "about": "SeedVR2 7B sharp fp16 + VAE, for ComfyUI-SeedVR2_VideoUpscaler.",
+    "components": {
+      "dit": {
+        "folder": "SEEDVR2",
+        "options": [
+          {
+            "label": "7B sharp fp16",
+            "repo": "numz/SeedVR2_comfyUI",
+            "file": "seedvr2_ema_7b_sharp_fp16.safetensors",
+            "gb": 16.479,
+            "official": false
+          }
+        ]
+      },
+      "vae": {
+        "folder": "SEEDVR2",
+        "options": [
+          {
+            "label": "fp16",
+            "repo": "numz/SeedVR2_comfyUI",
+            "file": "ema_vae_fp16.safetensors",
+            "gb": 0.501,
+            "official": false
           }
         ]
       }
